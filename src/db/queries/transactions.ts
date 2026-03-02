@@ -139,6 +139,58 @@ export async function getTotalsByType(
   return Number(row?.total ?? 0);
 }
 
+export type SearchTransactionsResult = {
+  transactions: Awaited<ReturnType<typeof baseTransactionsQuery>>;
+  totalCount: number;
+  totalIncome: number;
+  totalExpenses: number;
+};
+
+/**
+ * Server-side search: fetches all transactions (with optional date range),
+ * decrypts descriptions/account names, filters by search term, and returns
+ * a paginated slice plus totals. Used only when a search query is present.
+ */
+export async function searchTransactions(
+  userId: string,
+  search: string,
+  page: number,
+  pageSize: number,
+  startDate?: string,
+  endDate?: string,
+): Promise<SearchTransactionsResult> {
+  const safePage = Number.isFinite(page) && page > 0 ? Math.floor(page) : 1;
+  const safePageSize = Number.isFinite(pageSize) && pageSize > 0 ? Math.floor(pageSize) : 10;
+
+  let query = baseTransactionsQuery(userId);
+  if (startDate) query = query.where(gte(transactionsTable.date, startDate));
+  if (endDate) query = query.where(lte(transactionsTable.date, endDate));
+
+  const allRows = await query.orderBy(desc(transactionsTable.date), desc(transactionsTable.id));
+  const decrypted = decryptTransactionRows(allRows);
+
+  const needle = search.toLowerCase();
+  const filtered = decrypted.filter((row) => {
+    const desc = (row.description ?? '').toLowerCase();
+    const acct = (row.accountName ?? '').toLowerCase();
+    const cat = (row.category ?? '').toLowerCase();
+    return desc.includes(needle) || acct.includes(needle) || cat.includes(needle);
+  });
+
+  const totalCount = filtered.length;
+  const totalIncome = filtered
+    .filter((r) => r.type === 'income')
+    .reduce((s, r) => s + r.amount, 0);
+  const totalExpenses = filtered
+    .filter((r) => r.type === 'expense')
+    .reduce((s, r) => s + r.amount, 0);
+
+  const offset = (safePage - 1) * safePageSize;
+  const transactions = filtered.slice(offset, offset + safePageSize);
+
+  return { transactions, totalCount, totalIncome, totalExpenses };
+}
+
 export async function getLatestFiveTransactionsWithDetails(userId: string) {
   const rows = await baseTransactionsQuery(userId)
     .orderBy(desc(transactionsTable.date))
