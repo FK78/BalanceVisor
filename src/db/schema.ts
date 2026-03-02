@@ -115,6 +115,7 @@ export const debtsTable = pgTable("debts", {
 export const debtPaymentsTable = pgTable("debt_payments", {
   id: integer().primaryKey().generatedAlwaysAsIdentity(),
   debt_id: integer("debt_id").notNull().references(() => debtsTable.id, { onDelete: "cascade" }),
+  account_id: integer("account_id").notNull().references(() => accountsTable.id),
   amount: real().notNull(),
   date: date().notNull(),
   note: text(),
@@ -162,6 +163,7 @@ export const subscriptionsTable = pgTable("subscriptions", {
   billing_cycle: billingCycleEnum("billing_cycle").notNull().default("monthly"),
   next_billing_date: date("next_billing_date").notNull(),
   category_id: integer("category_id").references(() => categoriesTable.id),
+  account_id: integer("account_id").notNull().references(() => accountsTable.id),
   url: text(),
   notes: text(),
   is_active: boolean("is_active").notNull().default(true),

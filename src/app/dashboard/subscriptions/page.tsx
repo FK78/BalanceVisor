@@ -17,6 +17,7 @@ import {
 } from "lucide-react";
 import { getSubscriptions, getActiveSubscriptionsTotals, toMonthlyAmount } from "@/db/queries/subscriptions";
 import { getCategoriesByUser } from "@/db/queries/categories";
+import { getAccountsWithDetails } from "@/db/queries/accounts";
 import { getCurrentUserId } from "@/lib/auth";
 import { getUserBaseCurrency } from "@/db/queries/onboarding";
 import { formatCurrency } from "@/lib/formatCurrency";
@@ -34,10 +35,11 @@ const cycleLabels: Record<string, string> = {
 export default async function SubscriptionsPage() {
   const userId = await getCurrentUserId();
 
-  const [subscriptions, totals, categories, baseCurrency] = await Promise.all([
+  const [subscriptions, totals, categories, accounts, baseCurrency] = await Promise.all([
     getSubscriptions(userId),
     getActiveSubscriptionsTotals(userId),
     getCategoriesByUser(userId),
+    getAccountsWithDetails(userId),
     getUserBaseCurrency(userId),
   ]);
 
@@ -61,7 +63,7 @@ export default async function SubscriptionsPage() {
             Track and manage all your recurring subscriptions.
           </p>
         </div>
-        <SubscriptionFormDialog categories={categories} />
+        <SubscriptionFormDialog categories={categories} accounts={accounts} />
       </div>
 
       {/* Summary cards */}
@@ -150,7 +152,7 @@ export default async function SubscriptionsPage() {
               Add your first subscription to start tracking recurring costs like
               Netflix, Spotify, gym memberships, and more.
             </p>
-            <SubscriptionFormDialog categories={categories} />
+            <SubscriptionFormDialog categories={categories} accounts={accounts} />
           </CardContent>
         </Card>
       ) : (
@@ -222,12 +224,14 @@ export default async function SubscriptionsPage() {
                           billing_cycle: sub.billing_cycle,
                           next_billing_date: sub.next_billing_date,
                           category_id: sub.category_id,
+                          account_id: sub.account_id,
                           url: sub.url,
                           notes: sub.notes,
                           color: sub.color,
                           icon: sub.icon,
                         }}
                         categories={categories}
+                        accounts={accounts}
                       />
                       <DeleteSubscriptionButton id={sub.id} name={sub.name} />
                     </div>

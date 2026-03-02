@@ -6,6 +6,13 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import {
   Dialog,
   DialogContent,
   DialogDescription,
@@ -16,22 +23,30 @@ import {
 } from "@/components/ui/dialog";
 import { recordDebtPayment } from "@/db/mutations/debts";
 
+type Account = { id: number; accountName: string };
+
 export function DebtPaymentDialog({
   debtId,
   debtName,
   remainingAmount,
+  accounts,
 }: {
   debtId: number;
   debtName: string;
   remainingAmount: number;
+  accounts: Account[];
 }) {
   const [open, setOpen] = useState(false);
   const [view, setView] = useState<"form" | "success">("form");
   const [isPending, startTransition] = useTransition();
+  const [accountId, setAccountId] = useState("");
   const today = new Date().toISOString().split("T")[0];
 
   function handleOpenChange(nextOpen: boolean) {
-    if (!nextOpen) setView("form");
+    if (!nextOpen) {
+      setView("form");
+      setAccountId("");
+    }
     setOpen(nextOpen);
   }
 
@@ -43,7 +58,7 @@ export function DebtPaymentDialog({
     const note = (formData.get("note") as string) || undefined;
 
     startTransition(async () => {
-      await recordDebtPayment(debtId, amount, date, note);
+      await recordDebtPayment(debtId, amount, date, parseInt(accountId), note);
       setView("success");
     });
   }
@@ -110,6 +125,21 @@ export function DebtPaymentDialog({
                   defaultValue={today}
                   required
                 />
+              </div>
+              <div className="grid gap-2">
+                <Label>Account</Label>
+                <Select value={accountId} onValueChange={setAccountId} required>
+                  <SelectTrigger className="w-full">
+                    <SelectValue placeholder="Select account" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {accounts.map((acc) => (
+                      <SelectItem key={acc.id} value={acc.id.toString()}>
+                        {acc.accountName}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
               </div>
               <div className="grid gap-2">
                 <Label htmlFor="payment-note">Note (optional)</Label>

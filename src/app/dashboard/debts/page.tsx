@@ -6,6 +6,7 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { getDebtsSummary } from "@/db/queries/debts";
+import { getAccountsWithDetails } from "@/db/queries/accounts";
 import { getCurrentUserId } from "@/lib/auth";
 import { getUserBaseCurrency } from "@/db/queries/onboarding";
 import { formatCurrency } from "@/lib/formatCurrency";
@@ -18,8 +19,9 @@ import { CreditCard, CheckCircle2, TrendingDown, Percent } from "lucide-react";
 
 export default async function DebtsPage() {
   const userId = await getCurrentUserId();
-  const [summary, baseCurrency] = await Promise.all([
+  const [summary, accounts, baseCurrency] = await Promise.all([
     getDebtsSummary(userId),
+    getAccountsWithDetails(userId),
     getUserBaseCurrency(userId),
   ]);
 
@@ -229,6 +231,7 @@ export default async function DebtsPage() {
                       debtId={debt.id}
                       debtName={debt.name}
                       remainingAmount={debt.remaining_amount}
+                      accounts={accounts}
                     />
                   )}
 

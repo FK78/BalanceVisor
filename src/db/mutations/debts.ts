@@ -1,10 +1,12 @@
 'use server';
 
 import { db } from '@/index';
-import { debtsTable, debtPaymentsTable } from '@/db/schema';
-import { eq } from 'drizzle-orm';
+import { debtsTable, debtPaymentsTable, accountsTable } from '@/db/schema';
+import { eq, sql } from 'drizzle-orm';
 import { revalidatePath } from 'next/cache';
 import { getCurrentUserId } from '@/lib/auth';
+import { createTransaction } from '@/db/mutations/transactions';
+import { checkBudgetAlerts } from '@/lib/budget-alerts';
 
 export async function addDebt(formData: FormData) {
   const userId = await getCurrentUserId();
@@ -52,17 +54,21 @@ export async function deleteDebt(id: number) {
   revalidatePath('/dashboard');
 }
 
-export async function recordDebtPayment(debtId: number, amount: number, date: string, note?: string) {
+export async function recordDebtPayment(debtId: number, amount: number, date: string, accountId: number, note?: string) {
   // Insert payment record
   await db.insert(debtPaymentsTable).values({
     debt_id: debtId,
+    account_id: accountId,
     amount,
     date,
     note: note || null,
   });
 
   // Reduce remaining amount
-  const [debt] = await db.select({ remaining_amount: debtsTable.remaining_amount })
+  const [debt] = await db.select({
+    remaining_amount: debtsTable.remaining_amount,
+    name: debtsTable.name,
+  })
     .from(debtsTable)
     .where(eq(debtsTable.id, debtId));
 
@@ -74,6 +80,25 @@ export async function recordDebtPayment(debtId: number, amount: number, date: st
     }).where(eq(debtsTable.id, debtId));
   }
 
+  await createTransaction({
+    type: 'expense',
+    amount,
+    description: `Debt payment: ${debt?.name ?? 'Unknown'}`,
+    is_recurring: false,
+    date,
+    account_id: accountId,
+    category_id: null,
+  });
+
+  await db.update(accountsTable)
+    .set({ balance: sql`${accountsTable.balance} - ${amount}` })
+    .where(eq(accountsTable.id, accountId));
+
+  const userId = await getCurrentUserId();
+  await checkBudgetAlerts(userId);
+
   revalidatePath('/dashboard/debts');
+  revalidatePath('/dashboard/transactions');
+  revalidatePath('/dashboard/accounts');
   revalidatePath('/dashboard');
 }

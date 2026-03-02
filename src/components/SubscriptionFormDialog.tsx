@@ -24,6 +24,7 @@ import {
 import { addSubscription, editSubscription } from "@/db/mutations/subscriptions";
 
 type Category = { id: number; name: string; color: string };
+type Account = { id: number; accountName: string };
 
 type SubscriptionData = {
   id: number;
@@ -33,6 +34,7 @@ type SubscriptionData = {
   billing_cycle: string;
   next_billing_date: string | null;
   category_id: number | null;
+  account_id: number | null;
   url: string | null;
   notes: string | null;
   color: string;
@@ -42,9 +44,11 @@ type SubscriptionData = {
 export function SubscriptionFormDialog({
   subscription,
   categories,
+  accounts,
 }: {
   subscription?: SubscriptionData;
   categories: Category[];
+  accounts: Account[];
 }) {
   const isEdit = !!subscription;
   const [open, setOpen] = useState(false);
@@ -53,6 +57,7 @@ export function SubscriptionFormDialog({
   const [formKey, setFormKey] = useState(0);
   const [billingCycle, setBillingCycle] = useState(subscription?.billing_cycle ?? "monthly");
   const [categoryId, setCategoryId] = useState(subscription?.category_id?.toString() ?? "");
+  const [accountId, setAccountId] = useState(subscription?.account_id?.toString() ?? "");
 
   function handleOpenChange(nextOpen: boolean) {
     if (!nextOpen) {
@@ -70,6 +75,7 @@ export function SubscriptionFormDialog({
     } else {
       formData.delete("category_id");
     }
+    formData.set("account_id", accountId);
     startTransition(async () => {
       if (isEdit) {
         await editSubscription(subscription.id, formData);
@@ -84,6 +90,7 @@ export function SubscriptionFormDialog({
     setFormKey((k) => k + 1);
     setBillingCycle("monthly");
     setCategoryId("");
+    setAccountId("");
     setView("form");
   }
 
@@ -218,6 +225,22 @@ export function SubscriptionFormDialog({
                     </SelectContent>
                   </Select>
                 </div>
+              </div>
+
+              <div className="grid gap-2">
+                <Label>Account</Label>
+                <Select value={accountId} onValueChange={setAccountId} required>
+                  <SelectTrigger className="w-full">
+                    <SelectValue placeholder="Select account" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {accounts.map((acc) => (
+                      <SelectItem key={acc.id} value={acc.id.toString()}>
+                        {acc.accountName}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
               </div>
 
               <div className="grid gap-2">

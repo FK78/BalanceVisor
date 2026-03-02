@@ -10,6 +10,7 @@ const subscriptionSelect = {
   billing_cycle: subscriptionsTable.billing_cycle,
   next_billing_date: subscriptionsTable.next_billing_date,
   category_id: subscriptionsTable.category_id,
+  account_id: subscriptionsTable.account_id,
   categoryName: categoriesTable.name,
   categoryColor: categoriesTable.color,
   url: subscriptionsTable.url,
