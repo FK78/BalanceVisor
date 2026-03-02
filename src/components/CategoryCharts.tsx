@@ -16,7 +16,8 @@ import {
   ChartTooltipContent,
 } from "@/components/ui/chart";
 import { type MonthlyCategorySpendPoint } from "@/db/queries/transactions";
-import { formatCurrency } from "@/lib/formatCurrency";
+import { formatCurrency, formatCompactCurrency } from "@/lib/formatCurrency";
+import { formatMonthLabel } from "@/lib/date";
 import {
   Area,
   AreaChart,
@@ -34,20 +35,6 @@ type TopCategoryPoint = {
   total: number;
 };
 
-function formatMonthLabel(month: string) {
-  const [year, monthIndex] = month.split("-").map(Number);
-  const date = new Date(year, (monthIndex ?? 1) - 1, 1);
-  return new Intl.DateTimeFormat("en-GB", { month: "short" }).format(date);
-}
-
-function formatCompactCurrency(amount: number, currency: string) {
-  return new Intl.NumberFormat("en-GB", {
-    style: "currency",
-    currency,
-    notation: "compact",
-    maximumFractionDigits: 1,
-  }).format(amount);
-}
 
 export function CategoryCharts({
   topThisMonth,

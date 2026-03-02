@@ -22,8 +22,7 @@ import {
   DialogTrigger,
 } from "@/components/ui/dialog";
 import { recordDebtPayment } from "@/db/mutations/debts";
-
-type Account = { id: number; accountName: string };
+import type { Account } from "@/lib/types";
 
 export function DebtPaymentDialog({
   debtId,

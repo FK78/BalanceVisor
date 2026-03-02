@@ -13,7 +13,7 @@ import {
   ChartTooltip,
   ChartTooltipContent,
 } from "@/components/ui/chart";
-import { formatCurrency } from "@/lib/formatCurrency";
+import { formatCurrency, formatCompactCurrency } from "@/lib/formatCurrency";
 import {
   Area,
   AreaChart,
@@ -36,15 +36,6 @@ function formatDateLabel(dateStr: string) {
     day: "numeric",
     month: "short",
   }).format(d);
-}
-
-function formatCompactCurrency(amount: number, currency: string) {
-  return new Intl.NumberFormat("en-GB", {
-    style: "currency",
-    currency,
-    notation: "compact",
-    maximumFractionDigits: 1,
-  }).format(amount);
 }
 
 export function NetWorthChart({

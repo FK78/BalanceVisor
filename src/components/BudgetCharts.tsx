@@ -15,7 +15,7 @@ import {
   ChartTooltip,
   ChartTooltipContent,
 } from "@/components/ui/chart";
-import { formatCurrency } from "@/lib/formatCurrency";
+import { formatCurrency, formatCompactCurrency } from "@/lib/formatCurrency";
 import {
   Bar,
   BarChart,
@@ -31,15 +31,6 @@ type BudgetItem = {
   budgetAmount: number;
   budgetSpent: number;
 };
-
-function formatCompactCurrency(amount: number, currency: string) {
-  return new Intl.NumberFormat("en-GB", {
-    style: "currency",
-    currency,
-    notation: "compact",
-    maximumFractionDigits: 1,
-  }).format(amount);
-}
 
 export function BudgetCharts({
   budgets,

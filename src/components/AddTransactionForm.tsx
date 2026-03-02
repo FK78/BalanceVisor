@@ -22,6 +22,7 @@ import {
   DialogTrigger,
 } from "@/components/ui/dialog";
 import { addTransaction, editTransaction } from "@/db/mutations/transactions";
+import type { Account, Category } from "@/lib/types";
 
 type Transaction = {
   id: number;
@@ -36,9 +37,6 @@ type Transaction = {
   is_recurring: boolean;
   transfer_account_id?: number | null;
 };
-
-type Account = { id: number; accountName: string };
-type Category = { id: number; name: string };
 
 export function TransactionFormDialog({
   transaction,

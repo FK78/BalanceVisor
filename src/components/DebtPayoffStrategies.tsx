@@ -26,7 +26,7 @@ import {
   XAxis,
   YAxis,
 } from "recharts";
-import { formatCurrency } from "@/lib/formatCurrency";
+import { formatCurrency, formatCompactCurrency } from "@/lib/formatCurrency";
 import { Mountain, Snowflake, CalendarCheck, TrendingDown, Info } from "lucide-react";
 
 type Debt = {
@@ -223,15 +223,6 @@ export function DebtPayoffStrategies({
       { label: d.name, color: d.color },
     ]),
   ) as ChartConfig;
-
-  function formatCompactCurrency(amount: number) {
-    return new Intl.NumberFormat("en-GB", {
-      style: "currency",
-      currency,
-      notation: "compact",
-      maximumFractionDigits: 1,
-    }).format(amount);
-  }
 
   function formatMonths(m: number) {
     const years = Math.floor(m / 12);
@@ -430,7 +421,7 @@ export function DebtPayoffStrategies({
                 tickLine={false}
                 axisLine={false}
                 width={60}
-                tickFormatter={(v) => formatCompactCurrency(Number(v))}
+                tickFormatter={(v) => formatCompactCurrency(Number(v), currency)}
               />
               <ChartTooltip
                 cursor={false}

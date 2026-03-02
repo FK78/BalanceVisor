@@ -21,7 +21,8 @@ import type {
   MonthlyCashflowPoint,
   MonthlyCategorySpendPoint,
 } from "@/db/queries/transactions";
-import { formatCurrency } from "@/lib/formatCurrency";
+import { formatCurrency, formatCompactCurrency } from "@/lib/formatCurrency";
+import { formatMonthLabel } from "@/lib/date";
 import {
   Area,
   AreaChart,
@@ -46,23 +47,6 @@ import {
 } from "lucide-react";
 
 type RangeOption = 3 | 6 | 12;
-
-function formatMonthLabel(month: string) {
-  const [year, m] = month.split("-");
-  return new Intl.DateTimeFormat("en-GB", {
-    month: "short",
-    year: "2-digit",
-  }).format(new Date(Number(year), Number(m) - 1));
-}
-
-function formatCompactCurrency(amount: number, currency: string) {
-  return new Intl.NumberFormat("en-GB", {
-    style: "currency",
-    currency,
-    notation: "compact",
-    maximumFractionDigits: 1,
-  }).format(amount);
-}
 
 export function ReportsClient({
   monthlyTrend,

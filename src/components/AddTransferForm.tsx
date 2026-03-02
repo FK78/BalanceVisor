@@ -22,8 +22,7 @@ import {
   DialogTrigger,
 } from "@/components/ui/dialog";
 import { addTransfer } from "@/db/mutations/transactions";
-
-type Account = { id: number; accountName: string };
+import type { Account } from "@/lib/types";
 
 export function TransferFormDialog({
   accounts,

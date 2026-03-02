@@ -21,7 +21,8 @@ import {
   type DailyCashflowPoint,
   type DailyCategoryExpensePoint,
 } from "@/db/queries/transactions";
-import { formatCurrency } from "@/lib/formatCurrency";
+import { formatCurrency, formatCompactCurrency } from "@/lib/formatCurrency";
+import { formatDayLabel } from "@/lib/date";
 import {
   Bar,
   BarChart,
@@ -36,22 +37,6 @@ import {
 } from "recharts";
 
 type RangeOption = 7 | 30 | 90;
-
-function formatDayLabel(day: string) {
-  return new Intl.DateTimeFormat("en-GB", {
-    month: "short",
-    day: "numeric",
-  }).format(new Date(day));
-}
-
-function formatCompactCurrency(amount: number, currency: string) {
-  return new Intl.NumberFormat("en-GB", {
-    style: "currency",
-    currency,
-    notation: "compact",
-    maximumFractionDigits: 1,
-  }).format(amount);
-}
 
 function getWeekStartKey(dayKey: string) {
   const date = new Date(dayKey);

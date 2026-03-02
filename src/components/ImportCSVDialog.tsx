@@ -29,8 +29,7 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { importTransactionsFromCSV } from "@/db/mutations/import-csv";
-
-type Account = { id: number; accountName: string };
+import type { Account } from "@/lib/types";
 
 type ImportResult = {
   imported: number;

@@ -25,8 +25,7 @@ import {
   addCategorisationRule,
   editCategorisationRule,
 } from "@/db/mutations/categorisation-rules";
-
-type Category = { id: number; name: string; color: string };
+import type { CategoryWithColor as Category } from "@/lib/types";
 
 type Rule = {
   id: number;

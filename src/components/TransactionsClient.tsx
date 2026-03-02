@@ -54,6 +54,7 @@ import { ArrowDownLeft, ArrowRightLeft, ArrowUpDown, ArrowUpRight, CheckCircle2,
 import { SplitTransactionDialog } from "@/components/SplitTransactionDialog";
 import { deleteTransaction } from "@/db/mutations/transactions";
 import { formatCurrency } from "@/lib/formatCurrency";
+import type { Account, Category } from "@/lib/types";
 import { TransactionsInsightsCharts } from "@/components/TransactionsInsightsCharts";
 import type { DailyCashflowPoint, DailyCategoryExpensePoint } from "@/db/queries/transactions";
 
@@ -142,9 +143,6 @@ type SplitDetail = {
   amount: number;
   description: string | null;
 };
-
-type Account = { id: number; accountName: string };
-type Category = { id: number; name: string };
 
 function formatDate(date: string | null) {
   if (!date) return "—";

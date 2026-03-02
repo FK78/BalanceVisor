@@ -49,3 +49,16 @@ export function getNextMonthFirstString(): string {
   const now = new Date();
   return toDateString(new Date(now.getFullYear(), now.getMonth() + 1, 1));
 }
+
+export function formatMonthLabel(month: string): string {
+  const [year, monthIndex] = month.split("-").map(Number);
+  const date = new Date(year, (monthIndex ?? 1) - 1, 1);
+  return new Intl.DateTimeFormat("en-GB", { month: "short", year: "2-digit" }).format(date);
+}
+
+export function formatDayLabel(day: string): string {
+  return new Intl.DateTimeFormat("en-GB", {
+    month: "short",
+    day: "numeric",
+  }).format(new Date(day));
+}

@@ -22,9 +22,7 @@ import {
   DialogTrigger,
 } from "@/components/ui/dialog";
 import { addSplitTransaction } from "@/db/mutations/transactions";
-
-type Account = { id: number; accountName: string };
-type Category = { id: number; name: string };
+import type { Account, Category } from "@/lib/types";
 
 type SplitRow = {
   key: number;

@@ -22,9 +22,7 @@ import {
   DialogTrigger,
 } from "@/components/ui/dialog";
 import { addSubscription, editSubscription } from "@/db/mutations/subscriptions";
-
-type Category = { id: number; name: string; color: string };
-type Account = { id: number; accountName: string };
+import type { Account, CategoryWithColor as Category } from "@/lib/types";
 
 type SubscriptionData = {
   id: number;
