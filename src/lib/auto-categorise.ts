@@ -2,9 +2,14 @@ import { db } from '@/index';
 import { categorisationRulesTable } from '@/db/schema';
 import { eq, desc } from 'drizzle-orm';
 import { groq } from '@ai-sdk/groq';
-import { generateText, Output } from 'ai';
+import { generateText } from 'ai';
 import { z } from 'zod';
 import { getCategoriesByUser } from '@/db/queries/categories';
+
+const categoriseSchema = z.object({
+  category_id: z.string().nullable(),
+  confidence: z.number().min(0).max(1),
+});
 
 /**
  * Matches a transaction description against the user's categorisation rules.
@@ -57,22 +62,32 @@ async function aiCategorise(
 
     const categoryList = categories.map((c) => `- id: "${c.id}" → ${c.name}`).join('\n');
 
-    const { output } = await generateText({
-      model: groq('llama-3.1-8b-instant'),
-      output: Output.object({
-        schema: z.object({
-          category_id: z.string().nullable().describe('The id of the best matching category, or null if none fit'),
-          confidence: z.number().min(0).max(1).describe('Confidence score between 0 and 1'),
-        }),
-      }),
-      prompt: `You are a financial transaction categoriser. Given a transaction description and a list of categories, pick the single best category.\n\nTransaction: "${description}"\n\nCategories:\n${categoryList}\n\nReturn the category id that best matches this transaction. If no category is a reasonable fit, return null. Also provide a confidence score.`,
+    const { text: responseText } = await generateText({
+      model: groq('openai/gpt-oss-20b'),
+      prompt: `You are a financial transaction categoriser. Given a transaction description and a list of categories, pick the single best category.
+
+Transaction: "${description}"
+
+Categories:
+${categoryList}
+
+Return ONLY a JSON object with these exact fields:
+- category_id: the id string of the best matching category, or null if none fit
+- confidence: a number between 0 and 1
+
+Respond with ONLY the JSON object, no other text.`,
       maxOutputTokens: 100,
     });
 
-    if (output?.category_id && output.confidence >= 0.6) {
-      // Verify the returned id is actually one of the user's categories
-      const valid = categories.some((c) => c.id === output.category_id);
-      return valid ? output.category_id : null;
+    const jsonMatch = responseText.match(/\{[\s\S]*\}/);
+    if (!jsonMatch) return null;
+
+    const parsed = categoriseSchema.safeParse(JSON.parse(jsonMatch[0]));
+    if (!parsed.success) return null;
+
+    if (parsed.data.category_id && parsed.data.confidence >= 0.6) {
+      const valid = categories.some((c) => c.id === parsed.data.category_id);
+      return valid ? parsed.data.category_id : null;
     }
 
     return null;
