@@ -46,12 +46,11 @@ import {
   ColumnDef,
   flexRender,
   getCoreRowModel,
-  getFilteredRowModel,
   getSortedRowModel,
   SortingState,
   useReactTable,
 } from "@tanstack/react-table";
-import { ArrowDownLeft, ArrowRightLeft, ArrowUpDown, ArrowUpRight, CheckCircle2, ChevronDown, ChevronRight, Download, Receipt, RefreshCw, Split, Trash2, XCircle } from "lucide-react";
+import { ArrowDownLeft, ArrowRightLeft, ArrowUpDown, ArrowUpRight, CheckCircle2, ChevronDown, ChevronRight, Download, Receipt, RefreshCw, Search, Split, Trash2, X, XCircle } from "lucide-react";
 import { SplitTransactionDialog } from "@/components/SplitTransactionDialog";
 import { deleteTransaction } from "@/db/mutations/transactions";
 import { formatCurrency } from "@/lib/formatCurrency";
@@ -156,11 +155,12 @@ function formatDate(date: string | null) {
   }).format(new Date(date));
 }
 
-function getPageHref(page: number, startDate?: string, endDate?: string) {
+function getPageHref(page: number, startDate?: string, endDate?: string, search?: string) {
   const params = new URLSearchParams();
   if (page > 1) params.set("page", String(page));
   if (startDate) params.set("startDate", startDate);
   if (endDate) params.set("endDate", endDate);
+  if (search) params.set("search", search);
   const qs = params.toString();
   return `/dashboard/transactions${qs ? `?${qs}` : ""}`;
 }
@@ -189,6 +189,7 @@ export function TransactionsClient({
   totalExpenses,
   startDate: activeStartDate,
   endDate: activeEndDate,
+  search: activeSearch,
   dailyTrend,
   dailyCategoryExpenses,
   currency,
@@ -204,6 +205,7 @@ export function TransactionsClient({
   totalExpenses: number;
   startDate?: string;
   endDate?: string;
+  search?: string;
   dailyTrend: DailyCashflowPoint[];
   dailyCategoryExpenses: DailyCategoryExpensePoint[];
   currency: string;
@@ -214,12 +216,13 @@ export function TransactionsClient({
   const [highlightedIds, setHighlightedIds] = useState<Set<number>>(new Set());
   const [deleteResult, setDeleteResult] = useState<{ status: "success" | "error"; description?: string } | null>(null);
   const [sorting, setSorting] = useState<SortingState>([]);
-  const [globalFilter, setGlobalFilter] = useState("");
+  const [searchInput, setSearchInput] = useState(activeSearch ?? "");
   const [filterStartDate, setFilterStartDate] = useState(activeStartDate ?? "");
   const [filterEndDate, setFilterEndDate] = useState(activeEndDate ?? "");
   const [exportStartDate, setExportStartDate] = useState(() => formatDateInput(addDays(new Date(), -30)));
   const [exportEndDate, setExportEndDate] = useState(() => formatDateInput(new Date()));
   const isFilterActive = !!activeStartDate || !!activeEndDate;
+  const isSearchActive = !!activeSearch;
   const dateLabel = isFilterActive
     ? `${activeStartDate ?? "start"} to ${activeEndDate ?? "now"}`
     : "All time";
@@ -444,13 +447,10 @@ export function TransactionsClient({
     getRowId: (row) => String(row.id),
     state: {
       sorting,
-      globalFilter,
     },
     onSortingChange: setSorting,
-    onGlobalFilterChange: setGlobalFilter,
     getCoreRowModel: getCoreRowModel(),
     getSortedRowModel: getSortedRowModel(),
-    getFilteredRowModel: getFilteredRowModel(),
   });
 
   const rows = table.getRowModel().rows;
@@ -496,9 +496,50 @@ export function TransactionsClient({
         )}
       </div>
 
-      {/* Date range filter */}
+      {/* Search & date range filter */}
       <Card>
-        <CardContent className="pt-6">
+        <CardContent className="pt-6 space-y-4">
+          <form
+            onSubmit={(e) => {
+              e.preventDefault();
+              const trimmed = searchInput.trim();
+              router.push(getPageHref(1, activeStartDate, activeEndDate, trimmed || undefined));
+            }}
+          >
+            <div className="flex gap-2">
+              <div className="relative flex-1">
+                <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
+                <Input
+                  value={searchInput}
+                  onChange={(e) => setSearchInput(e.target.value)}
+                  placeholder="Search by description, account, or category..."
+                  className="pl-9"
+                />
+              </div>
+              <Button type="submit">
+                Search
+              </Button>
+              {isSearchActive && (
+                <Button
+                  type="button"
+                  variant="outline"
+                  onClick={() => {
+                    setSearchInput("");
+                    router.push(getPageHref(1, activeStartDate, activeEndDate));
+                  }}
+                >
+                  <X className="mr-1 h-3.5 w-3.5" />
+                  Clear
+                </Button>
+              )}
+            </div>
+          </form>
+          {isSearchActive && (
+            <p className="text-sm text-muted-foreground">
+              Showing results for <span className="font-medium text-foreground">&ldquo;{activeSearch}&rdquo;</span>
+              {" "}&mdash; {totalTransactions} match{totalTransactions !== 1 ? "es" : ""}
+            </p>
+          )}
           <div className="flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
             <div className="grid flex-1 grid-cols-1 gap-3 sm:grid-cols-2">
               <div className="space-y-1.5">
@@ -522,13 +563,13 @@ export function TransactionsClient({
             </div>
             <div className="flex gap-2">
               <Button asChild>
-                <Link href={getPageHref(1, filterStartDate || undefined, filterEndDate || undefined)}>
+                <Link href={getPageHref(1, filterStartDate || undefined, filterEndDate || undefined, activeSearch)}>
                   Apply Filter
                 </Link>
               </Button>
-              {isFilterActive && (
+              {(isFilterActive || isSearchActive) && (
                 <Button variant="outline" asChild>
-                  <Link href="/dashboard/transactions">Clear</Link>
+                  <Link href="/dashboard/transactions">Clear All</Link>
                 </Button>
               )}
             </div>
@@ -677,36 +718,8 @@ export function TransactionsClient({
                 </Button>
               </div>
             )
-          ) : rows.length === 0 ? (
-            <div className="space-y-4">
-              <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-                <Input
-                  value={globalFilter}
-                  onChange={(event) => setGlobalFilter(event.target.value)}
-                  placeholder="Search account, description, or category"
-                  className="max-w-sm"
-                />
-              </div>
-              <div className="text-muted-foreground flex flex-col items-center justify-center gap-3 py-12 text-center">
-                <Receipt className="h-10 w-10 opacity-40" />
-                <div>
-                  <p className="text-sm font-medium">No matching transactions</p>
-                  <p className="text-xs">
-                    Try adjusting your search for this page.
-                  </p>
-                </div>
-              </div>
-            </div>
           ) : (
             <>
-              <div className="mb-4 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-                <Input
-                  value={globalFilter}
-                  onChange={(event) => setGlobalFilter(event.target.value)}
-                  placeholder="Search account, description, or category"
-                  className="max-w-sm"
-                />
-              </div>
               <Table>
                 <TableHeader>
                   {table.getHeaderGroups().map((headerGroup) => (
@@ -789,16 +802,11 @@ export function TransactionsClient({
                   <p className="text-muted-foreground text-xs">
                     Showing {startIndex}–{endIndex} of {totalTransactions} transactions
                   </p>
-                  {globalFilter.trim() !== "" && (
-                    <p className="text-muted-foreground text-xs">
-                      {rows.length} matching transaction{rows.length === 1 ? "" : "s"} on this page
-                    </p>
-                  )}
                 </div>
                 <div className="flex items-center gap-2">
                   {resolvedCurrentPage > 1 ? (
                     <Button asChild size="sm" variant="outline">
-                      <Link href={getPageHref(resolvedCurrentPage - 1, activeStartDate, activeEndDate)}>Previous</Link>
+                      <Link href={getPageHref(resolvedCurrentPage - 1, activeStartDate, activeEndDate, activeSearch)}>Previous</Link>
                     </Button>
                   ) : (
                     <Button size="sm" variant="outline" disabled>
@@ -810,7 +818,7 @@ export function TransactionsClient({
                   </p>
                   {resolvedCurrentPage < totalPages ? (
                     <Button asChild size="sm" variant="outline">
-                      <Link href={getPageHref(resolvedCurrentPage + 1, activeStartDate, activeEndDate)}>Next</Link>
+                      <Link href={getPageHref(resolvedCurrentPage + 1, activeStartDate, activeEndDate, activeSearch)}>Next</Link>
                     </Button>
                   ) : (
                     <Button size="sm" variant="outline" disabled>

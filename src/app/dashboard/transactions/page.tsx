@@ -5,6 +5,7 @@ import {
   getTransactionsCount,
   getTransactionsWithDetailsPaginated,
   getTotalsByType,
+  searchTransactions,
 } from "@/db/queries/transactions";
 import { getAccountsWithDetails } from "@/db/queries/accounts";
 import { getCategoriesByUser } from "@/db/queries/categories";
@@ -33,25 +34,43 @@ function normalizeDate(value?: string): string | undefined {
 export default async function Transactions({
   searchParams,
 }: {
-  searchParams?: Promise<{ page?: string; startDate?: string; endDate?: string }>;
+  searchParams?: Promise<{ page?: string; startDate?: string; endDate?: string; search?: string }>;
 }) {
   const resolvedSearchParams = await searchParams;
   const requestedPage = normalizePage(resolvedSearchParams?.page);
   const startDate = normalizeDate(resolvedSearchParams?.startDate);
   const endDate = normalizeDate(resolvedSearchParams?.endDate);
+  const search = resolvedSearchParams?.search?.trim() || undefined;
   const userId = await getCurrentUserId();
 
-  const [transactions, accounts, categories, totalTransactions, totalIncome, totalExpenses, dailyTrend, dailyCategoryExpenses, baseCurrency] = await Promise.all([
-    getTransactionsWithDetailsPaginated(userId, requestedPage, PAGE_SIZE, startDate, endDate),
+  let transactions;
+  let totalTransactions: number;
+  let totalIncome: number;
+  let totalExpenses: number;
+
+  if (search) {
+    const result = await searchTransactions(userId, search, requestedPage, PAGE_SIZE, startDate, endDate);
+    transactions = result.transactions;
+    totalTransactions = result.totalCount;
+    totalIncome = result.totalIncome;
+    totalExpenses = result.totalExpenses;
+  } else {
+    [transactions, totalTransactions, totalIncome, totalExpenses] = await Promise.all([
+      getTransactionsWithDetailsPaginated(userId, requestedPage, PAGE_SIZE, startDate, endDate),
+      getTransactionsCount(userId, startDate, endDate),
+      getTotalsByType(userId, 'income', startDate, endDate),
+      getTotalsByType(userId, 'expense', startDate, endDate),
+    ]);
+  }
+
+  const [accounts, categories, dailyTrend, dailyCategoryExpenses, baseCurrency] = await Promise.all([
     getAccountsWithDetails(userId),
     getCategoriesByUser(userId),
-    getTransactionsCount(userId, startDate, endDate),
-    getTotalsByType(userId, 'income', startDate, endDate),
-    getTotalsByType(userId, 'expense', startDate, endDate),
     getDailyIncomeExpenseTrend(userId, 90),
     getDailyExpenseByCategory(userId, 90),
     getUserBaseCurrency(userId),
   ]);
+
   const totalPages = Math.max(1, Math.ceil(totalTransactions / PAGE_SIZE));
 
   if (totalTransactions > 0 && requestedPage > totalPages) {
@@ -59,6 +78,7 @@ export default async function Transactions({
     if (totalPages > 1) params.set("page", String(totalPages));
     if (startDate) params.set("startDate", startDate);
     if (endDate) params.set("endDate", endDate);
+    if (search) params.set("search", search);
     const qs = params.toString();
     redirect(`/dashboard/transactions${qs ? `?${qs}` : ""}`);
   }
@@ -83,6 +103,7 @@ export default async function Transactions({
       totalExpenses={totalExpenses}
       startDate={startDate}
       endDate={endDate}
+      search={search}
       dailyTrend={dailyTrend}
       dailyCategoryExpenses={dailyCategoryExpenses}
       currency={baseCurrency}
