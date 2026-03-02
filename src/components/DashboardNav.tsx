@@ -11,6 +11,7 @@ import {
   Trophy,
   TrendingUp,
   Repeat,
+  Settings,
   ChevronDown,
   Menu,
 } from "lucide-react";
@@ -34,6 +35,7 @@ const moreItems = [
   { href: "/dashboard/budgets", label: "Budgets", icon: Target },
   { href: "/dashboard/goals", label: "Goals", icon: Trophy },
   { href: "/dashboard/subscriptions", label: "Subscriptions", icon: Repeat },
+  { href: "/dashboard/settings", label: "Settings", icon: Settings },
 ];
 
 const allItems = [...primaryItems, ...moreItems];
