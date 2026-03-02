@@ -28,9 +28,9 @@ import {
 import type { CategoryWithColor as Category } from "@/lib/types";
 
 type Rule = {
-  id: number;
+  id: string;
   pattern: string;
-  category_id: number | null;
+  category_id: string | null;
   priority: number;
 };
 

@@ -41,7 +41,7 @@ function balanceDelta(type: 'income' | 'expense' | 'transfer', amount: number) {
 export async function addTransaction(formData: FormData) {
   const type = formData.get('type') as 'income' | 'expense';
   const amount = parseFloat(formData.get('amount') as string);
-  const accountId = Number(formData.get('account_id'));
+  const accountId = formData.get('account_id') as string;
 
   const isRecurring = formData.get('is_recurring') === 'true';
   const recurringPattern = isRecurring ? (formData.get('recurring_pattern') as string | null) : null;
@@ -51,7 +51,7 @@ export async function addTransaction(formData: FormData) {
     : null;
 
   const description = formData.get('description') as string;
-  let categoryId = Number(formData.get('category_id'));
+  let categoryId = (formData.get('category_id') as string) || null;
 
   // Auto-categorise if no category was selected
   if (!categoryId) {
@@ -67,7 +67,7 @@ export async function addTransaction(formData: FormData) {
     is_recurring: isRecurring,
     date: txnDate,
     account_id: accountId,
-    category_id: categoryId || Number(formData.get('category_id')),
+    category_id: categoryId || (formData.get('category_id') as string) || null,
     recurring_pattern: recurringPattern as typeof transactionsTable.$inferInsert['recurring_pattern'],
     next_recurring_date: nextRecurringDate,
   });
@@ -86,10 +86,10 @@ export async function addTransaction(formData: FormData) {
 }
 
 export async function editTransaction(formData: FormData) {
-  const id = Number(formData.get('id'));
+  const id = formData.get('id') as string;
   const newType = formData.get('type') as 'income' | 'expense';
   const newAmount = parseFloat(formData.get('amount') as string);
-  const newAccountId = Number(formData.get('account_id'));
+  const newAccountId = formData.get('account_id') as string;
 
   // Fetch old transaction to reverse its balance effect
   const [old] = await db.select({
@@ -112,7 +112,7 @@ export async function editTransaction(formData: FormData) {
     is_recurring: isRecurring,
     date: txnDate,
     account_id: newAccountId,
-    category_id: Number(formData.get('category_id')),
+    category_id: (formData.get('category_id') as string) || null,
     recurring_pattern: recurringPattern as typeof transactionsTable.$inferInsert['recurring_pattern'],
     next_recurring_date: nextRecurringDate,
   }).where(eq(transactionsTable.id, id)).returning({ id: transactionsTable.id });
@@ -141,8 +141,8 @@ export async function editTransaction(formData: FormData) {
 
 export async function addTransfer(formData: FormData) {
   const amount = parseFloat(formData.get('amount') as string);
-  const fromAccountId = Number(formData.get('from_account_id'));
-  const toAccountId = Number(formData.get('to_account_id'));
+  const fromAccountId = formData.get('from_account_id') as string;
+  const toAccountId = formData.get('to_account_id') as string;
   const description = formData.get('description') as string || 'Transfer';
   const txnDate = formData.get('date') as string;
 
@@ -180,7 +180,7 @@ export async function addTransfer(formData: FormData) {
   return result;
 }
 
-export async function deleteTransaction(id: number) {
+export async function deleteTransaction(id: string) {
   // Fetch transaction to reverse its balance effect
   const [txn] = await db.select({
     type: transactionsTable.type,
@@ -214,7 +214,7 @@ export async function deleteTransaction(id: number) {
 }
 
 export type SplitInput = {
-  category_id: number | null;
+  category_id: string | null;
   amount: number;
   description: string;
 };
@@ -223,7 +223,7 @@ export async function addSplitTransaction(
   type: 'income' | 'expense',
   totalAmount: number,
   description: string,
-  accountId: number,
+  accountId: string,
   txnDate: string,
   splits: SplitInput[],
 ) {

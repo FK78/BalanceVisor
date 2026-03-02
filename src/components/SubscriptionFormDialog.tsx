@@ -25,14 +25,14 @@ import { addSubscription, editSubscription } from "@/db/mutations/subscriptions"
 import type { Account, CategoryWithColor as Category } from "@/lib/types";
 
 type SubscriptionData = {
-  id: number;
+  id: string;
   name: string;
   amount: number;
   currency: string;
   billing_cycle: string;
   next_billing_date: string | null;
-  category_id: number | null;
-  account_id: number | null;
+  category_id: string | null;
+  account_id: string | null;
   url: string | null;
   notes: string | null;
   color: string;

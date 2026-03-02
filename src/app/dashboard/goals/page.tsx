@@ -27,7 +27,7 @@ export default async function GoalsPage() {
 
   // Precompute days-left for each goal (server component, runs once per request)
   const nowMs = new Date().getTime();
-  const daysLeftMap = new Map<number, number | null>();
+  const daysLeftMap = new Map<string, number | null>();
   for (const g of goals) {
     if (g.target_date) {
       const diff = new Date(g.target_date).getTime() - nowMs;

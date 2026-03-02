@@ -121,23 +121,23 @@ function DeleteTransactionButton({
 }
 
 type Transaction = {
-  id: number;
+  id: string;
   accountName: string;
-  account_id: number | null;
+  account_id: string | null;
   type: "income" | "expense" | "transfer" | null;
   amount: number;
   category: string | null;
-  category_id: number | null;
+  category_id: string | null;
   description: string;
   date: string | null;
   is_recurring: boolean;
-  transfer_account_id: number | null;
+  transfer_account_id: string | null;
   is_split: boolean;
 };
 
 type SplitDetail = {
-  id: number;
-  category_id: number | null;
+  id: string;
+  category_id: string | null;
   categoryName: string | null;
   categoryColor: string | null;
   amount: number;
@@ -207,11 +207,11 @@ export function TransactionsClient({
   dailyTrend: DailyCashflowPoint[];
   dailyCategoryExpenses: DailyCategoryExpensePoint[];
   currency: string;
-  splits?: Record<number, SplitDetail[]>;
+  splits?: Record<string, SplitDetail[]>;
 }) {
   const router = useRouter();
-  const [expandedSplits, setExpandedSplits] = useState<Set<number>>(new Set());
-  const [highlightedIds, setHighlightedIds] = useState<Set<number>>(new Set());
+  const [expandedSplits, setExpandedSplits] = useState<Set<string>>(new Set());
+  const [highlightedIds, setHighlightedIds] = useState<Set<string>>(new Set());
   const [deleteResult, setDeleteResult] = useState<{ status: "success" | "error"; description?: string } | null>(null);
   const [sorting, setSorting] = useState<SortingState>([]);
   const [searchInput, setSearchInput] = useState(activeSearch ?? "");
@@ -243,11 +243,11 @@ export function TransactionsClient({
     return () => clearTimeout(timer);
   }, [highlightedIds]);
 
-  const handleTransactionsAdded = useCallback((ids: number[]) => {
+  const handleTransactionsAdded = useCallback((ids: string[]) => {
     setHighlightedIds(new Set(ids));
   }, []);
 
-  const handleTransactionEdited = useCallback((id: number) => {
+  const handleTransactionEdited = useCallback((id: string) => {
     setHighlightedIds(new Set([id]));
   }, []);
 

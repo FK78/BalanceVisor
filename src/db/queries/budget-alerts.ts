@@ -2,7 +2,7 @@ import { db } from '@/index';
 import { budgetAlertPreferencesTable, budgetNotificationsTable } from '@/db/schema';
 import { eq, and, desc } from 'drizzle-orm';
 
-export async function getAlertPreferences(budgetId: number) {
+export async function getAlertPreferences(budgetId: string) {
   const [row] = await db.select()
     .from(budgetAlertPreferencesTable)
     .where(eq(budgetAlertPreferencesTable.budget_id, budgetId));

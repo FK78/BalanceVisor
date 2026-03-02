@@ -24,19 +24,19 @@ import {
 import { addBudget, editBudget } from "@/db/mutations/budgets";
 
 type Category = {
-  id: number;
+  id: string;
   name: string;
   color: string;
 };
 
 type Budget = {
-  id: number;
+  id: string;
   budgetCategory: string;
   budgetColor: string;
   budgetAmount: number;
   budgetSpent: number;
   budgetPeriod: string | null;
-  category_id: number | null;
+  category_id: string | null;
   start_date: string | null;
 };
 

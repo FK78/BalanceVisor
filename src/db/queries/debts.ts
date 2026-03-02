@@ -36,7 +36,7 @@ export async function getDebtsSummary(userId: string) {
   };
 }
 
-export async function getPaymentsForDebt(debtId: number) {
+export async function getPaymentsForDebt(debtId: string) {
   return await db
     .select()
     .from(debtPaymentsTable)
@@ -44,7 +44,7 @@ export async function getPaymentsForDebt(debtId: number) {
     .orderBy(desc(debtPaymentsTable.date));
 }
 
-export async function getTotalPaidForDebt(debtId: number): Promise<number> {
+export async function getTotalPaidForDebt(debtId: string): Promise<number> {
   const [row] = await db
     .select({ total: sum(debtPaymentsTable.amount) })
     .from(debtPaymentsTable)

@@ -48,7 +48,7 @@ export async function saveTrueLayerConnection(
 // Get a valid access token, refreshing if expired
 // ---------------------------------------------------------------------------
 
-async function getValidToken(connectionId: number): Promise<string> {
+async function getValidToken(connectionId: string): Promise<string> {
   const [conn] = await db
     .select()
     .from(truelayerConnectionsTable)
@@ -143,7 +143,7 @@ export async function importFromTrueLayer() {
         // Balance endpoint might not be available for all accounts
       }
 
-      let localAccountId: number;
+      let localAccountId: string;
 
       if (existing) {
         // Update balance
@@ -278,7 +278,7 @@ export async function getTrueLayerConnections() {
 // Disconnect a TrueLayer connection
 // ---------------------------------------------------------------------------
 
-export async function disconnectTrueLayer(connectionId: number) {
+export async function disconnectTrueLayer(connectionId: string) {
   const userId = await getCurrentUserId();
 
   // Get all accounts linked to this connection

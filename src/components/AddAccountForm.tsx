@@ -24,7 +24,7 @@ import {
 import { addAccount, editAccount } from "@/db/mutations/accounts";
 
 type Account = {
-  id: number;
+  id: string;
   accountName: string;
   type: string | null;
   balance: number;

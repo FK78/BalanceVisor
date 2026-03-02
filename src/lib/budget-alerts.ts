@@ -22,7 +22,7 @@ function getMonthRange(monthsAgo = 0) {
 }
 
 type BudgetWithSpend = {
-  budgetId: number;
+  budgetId: string;
   categoryName: string;
   budgetAmount: number;
   spent: number;
@@ -72,7 +72,7 @@ async function getBudgetsWithSpendAndPrefs(userId: string): Promise<BudgetWithSp
 
 async function hasRecentNotification(
   userId: string,
-  budgetId: number,
+  budgetId: string,
   alertType: 'threshold_warning' | 'over_budget',
 ): Promise<boolean> {
   const { start } = getMonthRange();
@@ -92,7 +92,7 @@ async function hasRecentNotification(
 }
 
 export type TriggeredAlert = {
-  budgetId: number;
+  budgetId: string;
   alertType: 'threshold_warning' | 'over_budget';
   message: string;
   emailAlerts: boolean;

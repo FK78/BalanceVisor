@@ -11,7 +11,7 @@ export async function addBudget(formData: FormData) {
 
   const [result] = await db.insert(budgetsTable).values({
     user_id: userId,
-    category_id: Number(formData.get('category_id')),
+    category_id: formData.get('category_id') as string,
     amount: parseFloat(formData.get('amount') as string),
     period: formData.get('period') as 'monthly' | 'weekly',
     start_date: formData.get('start_date') as string,
@@ -21,9 +21,9 @@ export async function addBudget(formData: FormData) {
   return result;
 }
 
-export async function editBudget(id: number, formData: FormData) {
+export async function editBudget(id: string, formData: FormData) {
   await db.update(budgetsTable).set({
-    category_id: Number(formData.get('category_id')),
+    category_id: formData.get('category_id') as string,
     amount: parseFloat(formData.get('amount') as string),
     period: formData.get('period') as 'monthly' | 'weekly',
     start_date: formData.get('start_date') as string,
@@ -31,7 +31,7 @@ export async function editBudget(id: number, formData: FormData) {
   revalidatePath('/dashboard/budgets');
 }
 
-export async function deleteBudget(id: number) {
+export async function deleteBudget(id: string) {
   await db.delete(budgetsTable).where(eq(budgetsTable.id, id));
   revalidatePath('/dashboard/budgets');
 }

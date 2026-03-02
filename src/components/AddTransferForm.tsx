@@ -29,7 +29,7 @@ export function TransferFormDialog({
   onSaved,
 }: {
   accounts: Account[];
-  onSaved?: (id: number) => void;
+  onSaved?: (id: string) => void;
 }) {
   const [open, setOpen] = useState(false);
   const [view, setView] = useState<"form" | "success">("form");

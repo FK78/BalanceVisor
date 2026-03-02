@@ -11,7 +11,7 @@ import { eq, desc } from 'drizzle-orm';
 export async function matchCategorisationRule(
   userId: string,
   description: string,
-): Promise<number | null> {
+): Promise<string | null> {
   const rules = await db.select({
     pattern: categorisationRulesTable.pattern,
     category_id: categorisationRulesTable.category_id,

@@ -20,7 +20,7 @@ export async function addCategory(formData: FormData) {
   return result;
 }
 
-export async function editCategory(id: number, formData: FormData) {
+export async function editCategory(id: string, formData: FormData) {
   await db.update(categoriesTable).set({
     name: formData.get('name') as string,
     color: formData.get('color') as string,
@@ -29,7 +29,7 @@ export async function editCategory(id: number, formData: FormData) {
   revalidatePath('/dashboard/categories');
 }
 
-export async function deleteCategory(id: number) {
+export async function deleteCategory(id: string) {
   await db.delete(categoriesTable).where(eq(categoriesTable.id, id));
   revalidatePath('/dashboard/categories');
 }

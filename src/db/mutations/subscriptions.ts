@@ -10,10 +10,10 @@ import { checkBudgetAlerts } from '@/lib/budget-alerts';
 
 export async function addSubscription(formData: FormData) {
   const userId = await getCurrentUserId();
-  const accountId = parseInt(formData.get('account_id') as string);
+  const accountId = formData.get('account_id') as string;
   const amount = parseFloat(formData.get('amount') as string);
   const name = formData.get('name') as string;
-  const categoryId = formData.get('category_id') ? parseInt(formData.get('category_id') as string) : null;
+  const categoryId = (formData.get('category_id') as string) || null;
   const nextBillingDate = formData.get('next_billing_date') as string;
 
   const [result] = await db.insert(subscriptionsTable).values({
@@ -54,9 +54,9 @@ export async function addSubscription(formData: FormData) {
   return result;
 }
 
-export async function editSubscription(id: number, formData: FormData) {
+export async function editSubscription(id: string, formData: FormData) {
   const userId = await getCurrentUserId();
-  const accountId = parseInt(formData.get('account_id') as string);
+  const accountId = formData.get('account_id') as string;
 
   await db.update(subscriptionsTable).set({
     name: formData.get('name') as string,
@@ -64,7 +64,7 @@ export async function editSubscription(id: number, formData: FormData) {
     currency: (formData.get('currency') as string) || 'GBP',
     billing_cycle: (formData.get('billing_cycle') as 'weekly' | 'monthly' | 'quarterly' | 'yearly') || 'monthly',
     next_billing_date: formData.get('next_billing_date') as string,
-    category_id: formData.get('category_id') ? parseInt(formData.get('category_id') as string) : null,
+    category_id: (formData.get('category_id') as string) || null,
     account_id: accountId,
     url: (formData.get('url') as string) || null,
     notes: (formData.get('notes') as string) || null,
@@ -76,7 +76,7 @@ export async function editSubscription(id: number, formData: FormData) {
   revalidatePath('/dashboard');
 }
 
-export async function deleteSubscription(id: number) {
+export async function deleteSubscription(id: string) {
   const userId = await getCurrentUserId();
   await db.delete(subscriptionsTable).where(
     and(eq(subscriptionsTable.id, id), eq(subscriptionsTable.user_id, userId))
@@ -85,7 +85,7 @@ export async function deleteSubscription(id: number) {
   revalidatePath('/dashboard');
 }
 
-export async function toggleSubscription(id: number) {
+export async function toggleSubscription(id: string) {
   const userId = await getCurrentUserId();
 
   const [sub] = await db.select({ is_active: subscriptionsTable.is_active })

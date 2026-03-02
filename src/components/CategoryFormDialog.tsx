@@ -18,7 +18,7 @@ import {
 import { addCategory, editCategory } from "@/db/mutations/categories";
 
 type Category = {
-  id: number;
+  id: string;
   name: string;
   color: string;
   icon: string | null;

@@ -30,7 +30,7 @@ export function DebtPaymentDialog({
   remainingAmount,
   accounts,
 }: {
-  debtId: number;
+  debtId: string;
   debtName: string;
   remainingAmount: number;
   accounts: Account[];
@@ -57,7 +57,7 @@ export function DebtPaymentDialog({
     const note = (formData.get("note") as string) || undefined;
 
     startTransition(async () => {
-      await recordDebtPayment(debtId, amount, date, parseInt(accountId), note);
+      await recordDebtPayment(debtId, amount, date, accountId, note);
       setView("success");
     });
   }

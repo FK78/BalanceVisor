@@ -3,7 +3,7 @@
 import { DeleteConfirmButton } from "@/components/DeleteConfirmButton";
 import { deleteGoal } from "@/db/mutations/goals";
 
-export function DeleteGoalButton({ id }: { id: number }) {
+export function DeleteGoalButton({ id }: { id: string }) {
   return (
     <DeleteConfirmButton
       dialogTitle="Delete Goal"

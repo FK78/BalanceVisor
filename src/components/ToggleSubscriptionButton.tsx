@@ -5,7 +5,7 @@ import { Pause, Play, Loader2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { toggleSubscription } from "@/db/mutations/subscriptions";
 
-export function ToggleSubscriptionButton({ id, isActive }: { id: number; isActive: boolean }) {
+export function ToggleSubscriptionButton({ id, isActive }: { id: string; isActive: boolean }) {
   const [isPending, startTransition] = useTransition();
 
   function handleToggle() {

@@ -25,7 +25,7 @@ export async function addAccount(formData: FormData) {
   return result;
 }
 
-export async function editAccount(id: number, formData: FormData) {
+export async function editAccount(id: string, formData: FormData) {
   const userId = await getCurrentUserId();
   const baseCurrency = await getUserBaseCurrency(userId);
 
@@ -39,7 +39,7 @@ export async function editAccount(id: number, formData: FormData) {
   revalidatePath('/dashboard');
 }
 
-export async function deleteAccount(id: number) {
+export async function deleteAccount(id: string) {
   await db.delete(transactionsTable).where(eq(transactionsTable.account_id, id));
   await db.delete(accountsTable).where(eq(accountsTable.id, id));
   revalidatePath('/dashboard/accounts');

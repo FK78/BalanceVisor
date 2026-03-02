@@ -103,7 +103,7 @@ function parseAmount(raw: string): number | null {
 export async function importTransactionsFromCSV(
   csvText: string,
   mapping: CsvColumnMapping,
-  accountId: number,
+  accountId: string,
   defaultType: 'income' | 'expense' | 'auto',
 ): Promise<{ imported: number; skipped: number; errors: string[] }> {
   const userId = await getCurrentUserId();

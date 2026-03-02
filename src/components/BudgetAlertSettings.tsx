@@ -28,7 +28,7 @@ export function BudgetAlertSettings({
   budgetCategory,
   prefs,
 }: {
-  budgetId: number;
+  budgetId: string;
   budgetCategory: string;
   prefs: AlertPrefs;
 }) {

@@ -5,7 +5,7 @@ import { Trash2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { deleteCategorisationRule } from "@/db/mutations/categorisation-rules";
 
-export function DeleteRuleButton({ ruleId }: { ruleId: number }) {
+export function DeleteRuleButton({ ruleId }: { ruleId: string }) {
   const [isPending, startTransition] = useTransition();
 
   function handleDelete() {

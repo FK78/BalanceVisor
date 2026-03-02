@@ -28,7 +28,7 @@ import {
 } from "recharts";
 
 type AccountItem = {
-  id: number;
+  id: string;
   accountName: string;
   type: string | null;
   balance: number;

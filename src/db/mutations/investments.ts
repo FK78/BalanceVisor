@@ -77,7 +77,7 @@ export async function addManualHolding(formData: FormData) {
   revalidateInvestments();
 }
 
-export async function editManualHolding(id: number, formData: FormData) {
+export async function editManualHolding(id: string, formData: FormData) {
   const userId = await getCurrentUserId();
   const ticker = (formData.get("ticker") as string).toUpperCase();
   const name = formData.get("name") as string;
@@ -97,7 +97,7 @@ export async function editManualHolding(id: number, formData: FormData) {
   revalidateInvestments();
 }
 
-export async function deleteManualHolding(id: number) {
+export async function deleteManualHolding(id: string) {
   const userId = await getCurrentUserId();
   await db
     .delete(manualHoldingsTable)

@@ -3,7 +3,7 @@
 import { DeleteConfirmButton } from "@/components/DeleteConfirmButton";
 import { deleteBudget } from "@/db/mutations/budgets";
 
-export function DeleteBudgetButton({ budget }: { budget: { id: number; budgetCategory: string } }) {
+export function DeleteBudgetButton({ budget }: { budget: { id: string; budgetCategory: string } }) {
   return (
     <DeleteConfirmButton
       onDelete={() => deleteBudget(budget.id)}

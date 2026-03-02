@@ -37,7 +37,7 @@ export default async function DebtsPage() {
   } = summary;
 
   const nowMs = new Date().getTime();
-  const daysLeftMap = new Map<number, number | null>();
+  const daysLeftMap = new Map<string, number | null>();
   for (const d of debts) {
     if (d.due_date) {
       const diff = new Date(d.due_date).getTime() - nowMs;

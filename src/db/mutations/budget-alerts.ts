@@ -7,7 +7,7 @@ import { revalidatePath } from 'next/cache';
 import { getCurrentUserId } from '@/lib/auth';
 
 export async function upsertAlertPreferences(
-  budgetId: number,
+  budgetId: string,
   threshold: number,
   browserAlerts: boolean,
   emailAlerts: boolean,
@@ -40,7 +40,7 @@ export async function upsertAlertPreferences(
   revalidatePath('/dashboard/budgets');
 }
 
-export async function markNotificationRead(notificationId: number) {
+export async function markNotificationRead(notificationId: string) {
   await db.update(budgetNotificationsTable)
     .set({ is_read: true })
     .where(eq(budgetNotificationsTable.id, notificationId));
@@ -62,7 +62,7 @@ export async function markAllNotificationsRead() {
 
 export async function createNotification(
   userId: string,
-  budgetId: number,
+  budgetId: string,
   alertType: 'threshold_warning' | 'over_budget',
   message: string,
 ) {

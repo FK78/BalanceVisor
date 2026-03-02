@@ -5,7 +5,7 @@ export function TransactionRow({
   t,
   currency,
 }: {
-  t: { id: number; description: string | null; category: string | null; date: string | null; amount: number; type: "income" | "expense" | "transfer" };
+  t: { id: string; description: string | null; category: string | null; date: string | null; amount: number; type: "income" | "expense" | "transfer" };
   currency: string;
 }) {
     const colorClass =

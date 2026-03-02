@@ -5,7 +5,7 @@ export type T212AccountSummary = {
     reservedForOrders: number;
   };
   currency: string;
-  id: number;
+  id: string;
   investments: {
     currentValue: number;
     realizedProfitLoss: number;
@@ -16,7 +16,7 @@ export type T212AccountSummary = {
 };
 
 export type T212Position = {
-  averagePricePaid: number;
+  averagePricePaid: string;
   createdAt: string;
   currentPrice: number;
   instrument: {

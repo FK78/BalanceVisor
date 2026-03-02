@@ -18,7 +18,7 @@ import { addManualHolding, editManualHolding } from "@/db/mutations/investments"
 import { searchTickers } from "@/db/queries/investments";
 
 type Holding = {
-  id: number;
+  id: string;
   ticker: string;
   name: string;
   quantity: number;

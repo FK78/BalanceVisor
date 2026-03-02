@@ -37,7 +37,7 @@ function baseTransactionsQuery(userId: string) {
 }
 
 export type ExportTransaction = {
-  id: number;
+  id: string;
   date: string | null;
   type: 'income' | 'expense' | 'transfer' | null;
   amount: number;
@@ -45,7 +45,7 @@ export type ExportTransaction = {
   accountName: string;
   category: string | null;
   isRecurring: boolean;
-  transferAccountId: number | null;
+  transferAccountId: string | null;
 };
 
 export async function getTransactionsForExport(

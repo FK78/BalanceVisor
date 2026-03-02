@@ -17,7 +17,7 @@ import {
 import { addGoal, editGoal } from "@/db/mutations/goals";
 
 type Goal = {
-  id: number;
+  id: string;
   name: string;
   target_amount: number;
   saved_amount: number;

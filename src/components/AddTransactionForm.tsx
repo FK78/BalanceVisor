@@ -25,17 +25,17 @@ import { addTransaction, editTransaction } from "@/db/mutations/transactions";
 import type { Account, Category } from "@/lib/types";
 
 type Transaction = {
-  id: number;
+  id: string;
   accountName: string;
-  account_id: number | null;
+  account_id: string | null;
   type: "income" | "expense" | "transfer" | null;
   amount: number;
   category: string | null;
-  category_id: number | null;
+  category_id: string | null;
   description: string;
   date: string | null;
   is_recurring: boolean;
-  transfer_account_id?: number | null;
+  transfer_account_id?: string | null;
 };
 
 export function TransactionFormDialog({
@@ -47,12 +47,12 @@ export function TransactionFormDialog({
   transaction?: Transaction;
   accounts: Account[];
   categories: Category[];
-  onSaved?: (ids: number[]) => void;
+  onSaved?: (ids: string[]) => void;
 }) {
   const isEdit = !!transaction;
   const [open, setOpen] = useState(false);
   const [view, setView] = useState<"form" | "success">("form");
-  const [savedIds, setSavedIds] = useState<number[]>([]);
+  const [savedIds, setSavedIds] = useState<string[]>([]);
   const [isPending, startTransition] = useTransition();
   const [formKey, setFormKey] = useState(0);
   const [isRecurring, setIsRecurring] = useState(transaction?.is_recurring ?? false);

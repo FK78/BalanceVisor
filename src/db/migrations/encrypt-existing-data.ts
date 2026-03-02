@@ -20,8 +20,8 @@ const db = drizzle(client);
 
 async function migrateTable(
   label: string,
-  fetchAll: () => Promise<{ id: number; [key: string]: unknown }[]>,
-  updateRow: (id: number, encrypted: Record<string, string>) => Promise<void>,
+  fetchAll: () => Promise<{ id: string; [key: string]: unknown }[]>,
+  updateRow: (id: string, encrypted: Record<string, string>) => Promise<void>,
   fields: string[],
 ) {
   const rows = await fetchAll();

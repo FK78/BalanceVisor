@@ -99,7 +99,7 @@ export function SplitTransactionDialog({
     const validSplits = splits
       .filter((s) => parseFloat(s.amount) > 0)
       .map((s) => ({
-        category_id: s.category_id ? parseInt(s.category_id) : null,
+        category_id: s.category_id || null,
         amount: parseFloat(s.amount),
         description: s.description,
       }));
@@ -111,7 +111,7 @@ export function SplitTransactionDialog({
         type,
         totalAmount,
         description,
-        parseInt(accountId),
+        accountId,
         txnDate,
         validSplits,
       );

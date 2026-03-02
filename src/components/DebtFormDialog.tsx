@@ -17,7 +17,7 @@ import {
 import { addDebt, editDebt } from "@/db/mutations/debts";
 
 type Debt = {
-  id: number;
+  id: string;
   name: string;
   original_amount: number;
   remaining_amount: number;

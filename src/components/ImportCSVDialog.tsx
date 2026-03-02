@@ -216,7 +216,7 @@ export function ImportCSVDialog({
             amount: parseInt(amountCol),
             type: typeCol !== UNMAPPED ? parseInt(typeCol) : null,
           },
-          parseInt(accountId),
+          accountId,
           defaultType
         );
         setResult(res);

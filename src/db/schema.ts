@@ -6,7 +6,7 @@ export const transactionTypeEnum = pgEnum("transaction_type", ["income", "expens
 export const recurringPatternEnum = pgEnum("recurring_pattern", ["daily", "weekly", "biweekly", "monthly", "yearly"]);
 
 export const defaultCategoryTemplatesTable = pgTable("default_category_templates", {
-  id: integer().primaryKey().generatedAlwaysAsIdentity(),
+  id: uuid().primaryKey().defaultRandom(),
   name: varchar({ length: 255 }).notNull(),
   color: varchar({ length: 8 }).notNull(),
   icon: varchar({ length: 255 }),
@@ -23,7 +23,7 @@ export const userOnboardingTable = pgTable("user_onboarding", {
 });
 
 export const truelayerConnectionsTable = pgTable("truelayer_connections", {
-  id: integer().primaryKey().generatedAlwaysAsIdentity(),
+  id: uuid().primaryKey().defaultRandom(),
   user_id: uuid("user_id").notNull(),
   access_token: text("access_token").notNull(),
   refresh_token: text("refresh_token").notNull(),
@@ -33,18 +33,18 @@ export const truelayerConnectionsTable = pgTable("truelayer_connections", {
 });
 
 export const accountsTable = pgTable("accounts", {
-  id: integer().primaryKey().generatedAlwaysAsIdentity(),
+  id: uuid().primaryKey().defaultRandom(),
   user_id: uuid("user_id").notNull(),
   name: text().notNull(),
   type: accountTypeEnum(),
   balance: real().notNull(),
   currency: varchar({ length: 3 }).notNull(),
   truelayer_id: varchar("truelayer_id", { length: 255 }),
-  truelayer_connection_id: integer("truelayer_connection_id").references(() => truelayerConnectionsTable.id),
+  truelayer_connection_id: uuid("truelayer_connection_id").references(() => truelayerConnectionsTable.id),
 });
 
 export const categoriesTable = pgTable("categories", {
-  id: integer().primaryKey().generatedAlwaysAsIdentity(),
+  id: uuid().primaryKey().defaultRandom(),
   user_id: uuid("user_id").notNull(),
   name: varchar({ length: 255 }).notNull(),
   color: varchar({ length: 8 }).notNull(),
@@ -52,9 +52,9 @@ export const categoriesTable = pgTable("categories", {
 });
 
 export const transactionsTable = pgTable("transactions", {
-  id: integer().primaryKey().generatedAlwaysAsIdentity(),
-  account_id: integer("account_id").references(() => accountsTable.id),
-  category_id: integer("category_id").references(() => categoriesTable.id),
+  id: uuid().primaryKey().defaultRandom(),
+  account_id: uuid("account_id").references(() => accountsTable.id),
+  category_id: uuid("category_id").references(() => categoriesTable.id),
   type: transactionTypeEnum().notNull(),
   amount: real().notNull(),
   description: text().notNull(),
@@ -63,30 +63,30 @@ export const transactionsTable = pgTable("transactions", {
   recurring_pattern: recurringPatternEnum("recurring_pattern"),
   next_recurring_date: date("next_recurring_date"),
   created_at: date().defaultNow(),
-  transfer_account_id: integer("transfer_account_id").references(() => accountsTable.id),
+  transfer_account_id: uuid("transfer_account_id").references(() => accountsTable.id),
   truelayer_id: varchar("truelayer_id", { length: 255 }),
   is_split: boolean("is_split").notNull().default(false),
 });
 
 export const budgetsTable = pgTable("budgets", {
-    id: integer().primaryKey().generatedAlwaysAsIdentity(),
+    id: uuid().primaryKey().defaultRandom(),
     user_id: uuid("user_id").notNull(),
-    category_id: integer("category_id").references(() => categoriesTable.id),
+    category_id: uuid("category_id").references(() => categoriesTable.id),
     amount: real().notNull(),
     period: periodEnum(),
     start_date: date()
 })
 
 export const categorisationRulesTable = pgTable("categorisation_rules", {
-    id: integer().primaryKey().generatedAlwaysAsIdentity(),
+    id: uuid().primaryKey().defaultRandom(),
     user_id: uuid("user_id").notNull(),
     pattern: varchar({ length: 255 }).notNull(),
-    category_id: integer("category_id").references(() => categoriesTable.id),
+    category_id: uuid("category_id").references(() => categoriesTable.id),
     priority: integer().notNull(),
 })
 
 export const goalsTable = pgTable("goals", {
-  id: integer().primaryKey().generatedAlwaysAsIdentity(),
+  id: uuid().primaryKey().defaultRandom(),
   user_id: uuid("user_id").notNull(),
   name: varchar({ length: 255 }).notNull(),
   target_amount: real("target_amount").notNull(),
@@ -98,7 +98,7 @@ export const goalsTable = pgTable("goals", {
 });
 
 export const debtsTable = pgTable("debts", {
-  id: integer().primaryKey().generatedAlwaysAsIdentity(),
+  id: uuid().primaryKey().defaultRandom(),
   user_id: uuid("user_id").notNull(),
   name: varchar({ length: 255 }).notNull(),
   original_amount: real("original_amount").notNull(),
@@ -113,9 +113,9 @@ export const debtsTable = pgTable("debts", {
 });
 
 export const debtPaymentsTable = pgTable("debt_payments", {
-  id: integer().primaryKey().generatedAlwaysAsIdentity(),
-  debt_id: integer("debt_id").notNull().references(() => debtsTable.id, { onDelete: "cascade" }),
-  account_id: integer("account_id").notNull().references(() => accountsTable.id),
+  id: uuid().primaryKey().defaultRandom(),
+  debt_id: uuid("debt_id").notNull().references(() => debtsTable.id, { onDelete: "cascade" }),
+  account_id: uuid("account_id").notNull().references(() => accountsTable.id),
   amount: real().notNull(),
   date: date().notNull(),
   note: text(),
@@ -123,8 +123,8 @@ export const debtPaymentsTable = pgTable("debt_payments", {
 });
 
 export const budgetAlertPreferencesTable = pgTable("budget_alert_preferences", {
-    id: integer().primaryKey().generatedAlwaysAsIdentity(),
-    budget_id: integer("budget_id").notNull().references(() => budgetsTable.id, { onDelete: "cascade" }),
+    id: uuid().primaryKey().defaultRandom(),
+    budget_id: uuid("budget_id").notNull().references(() => budgetsTable.id, { onDelete: "cascade" }),
     user_id: uuid("user_id").notNull(),
     threshold: real().notNull().default(80),
     browser_alerts: boolean("browser_alerts").notNull().default(true),
@@ -132,7 +132,7 @@ export const budgetAlertPreferencesTable = pgTable("budget_alert_preferences", {
 })
 
 export const trading212ConnectionsTable = pgTable("trading212_connections", {
-  id: integer().primaryKey().generatedAlwaysAsIdentity(),
+  id: uuid().primaryKey().defaultRandom(),
   user_id: uuid("user_id").notNull().unique(),
   api_key_encrypted: text("api_key_encrypted").notNull(),
   environment: varchar({ length: 10 }).notNull().default("live"),
@@ -140,7 +140,7 @@ export const trading212ConnectionsTable = pgTable("trading212_connections", {
 });
 
 export const manualHoldingsTable = pgTable("manual_holdings", {
-  id: integer().primaryKey().generatedAlwaysAsIdentity(),
+  id: uuid().primaryKey().defaultRandom(),
   user_id: uuid("user_id").notNull(),
   ticker: varchar({ length: 20 }).notNull(),
   name: varchar({ length: 255 }).notNull(),
@@ -155,15 +155,15 @@ export const manualHoldingsTable = pgTable("manual_holdings", {
 export const billingCycleEnum = pgEnum("billing_cycle", ["weekly", "monthly", "quarterly", "yearly"]);
 
 export const subscriptionsTable = pgTable("subscriptions", {
-  id: integer().primaryKey().generatedAlwaysAsIdentity(),
+  id: uuid().primaryKey().defaultRandom(),
   user_id: uuid("user_id").notNull(),
   name: varchar({ length: 255 }).notNull(),
   amount: real().notNull(),
   currency: varchar({ length: 3 }).notNull().default("GBP"),
   billing_cycle: billingCycleEnum("billing_cycle").notNull().default("monthly"),
   next_billing_date: date("next_billing_date").notNull(),
-  category_id: integer("category_id").references(() => categoriesTable.id),
-  account_id: integer("account_id").notNull().references(() => accountsTable.id),
+  category_id: uuid("category_id").references(() => categoriesTable.id),
+  account_id: uuid("account_id").notNull().references(() => accountsTable.id),
   url: text(),
   notes: text(),
   is_active: boolean("is_active").notNull().default(true),
@@ -173,15 +173,15 @@ export const subscriptionsTable = pgTable("subscriptions", {
 });
 
 export const transactionSplitsTable = pgTable("transaction_splits", {
-  id: integer().primaryKey().generatedAlwaysAsIdentity(),
-  transaction_id: integer("transaction_id").notNull().references(() => transactionsTable.id, { onDelete: "cascade" }),
-  category_id: integer("category_id").references(() => categoriesTable.id),
+  id: uuid().primaryKey().defaultRandom(),
+  transaction_id: uuid("transaction_id").notNull().references(() => transactionsTable.id, { onDelete: "cascade" }),
+  category_id: uuid("category_id").references(() => categoriesTable.id),
   amount: real().notNull(),
   description: text(),
 });
 
 export const netWorthSnapshotsTable = pgTable("net_worth_snapshots", {
-  id: integer().primaryKey().generatedAlwaysAsIdentity(),
+  id: uuid().primaryKey().defaultRandom(),
   user_id: uuid("user_id").notNull(),
   date: date().notNull(),
   net_worth: real("net_worth").notNull(),
@@ -194,9 +194,9 @@ export const netWorthSnapshotsTable = pgTable("net_worth_snapshots", {
 export const alertTypeEnum = pgEnum("alert_type", ["threshold_warning", "over_budget"]);
 
 export const budgetNotificationsTable = pgTable("budget_notifications", {
-    id: integer().primaryKey().generatedAlwaysAsIdentity(),
+    id: uuid().primaryKey().defaultRandom(),
     user_id: uuid("user_id").notNull(),
-    budget_id: integer("budget_id").notNull().references(() => budgetsTable.id, { onDelete: "cascade" }),
+    budget_id: uuid("budget_id").notNull().references(() => budgetsTable.id, { onDelete: "cascade" }),
     alert_type: alertTypeEnum("alert_type").notNull(),
     message: text().notNull(),
     is_read: boolean("is_read").notNull().default(false),

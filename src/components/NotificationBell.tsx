@@ -11,9 +11,9 @@ import {
 import { markNotificationRead, markAllNotificationsRead } from "@/db/mutations/budget-alerts";
 
 type Notification = {
-  id: number;
+  id: string;
   user_id: string;
-  budget_id: number;
+  budget_id: string;
   alert_type: "threshold_warning" | "over_budget";
   message: string;
   is_read: boolean;
@@ -56,7 +56,7 @@ export function NotificationBell({
     }
   }, [permissionState, unreadCount, notifications]);
 
-  function handleMarkRead(id: number) {
+  function handleMarkRead(id: string) {
     startTransition(async () => {
       await markNotificationRead(id);
     });

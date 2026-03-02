@@ -23,7 +23,7 @@ export async function addGoal(formData: FormData) {
   return result;
 }
 
-export async function editGoal(id: number, formData: FormData) {
+export async function editGoal(id: string, formData: FormData) {
   await db.update(goalsTable).set({
     name: formData.get('name') as string,
     target_amount: parseFloat(formData.get('target_amount') as string),
@@ -36,13 +36,13 @@ export async function editGoal(id: number, formData: FormData) {
   revalidatePath('/dashboard');
 }
 
-export async function deleteGoal(id: number) {
+export async function deleteGoal(id: string) {
   await db.delete(goalsTable).where(eq(goalsTable.id, id));
   revalidatePath('/dashboard/goals');
   revalidatePath('/dashboard');
 }
 
-export async function contributeToGoal(id: number, amount: number) {
+export async function contributeToGoal(id: string, amount: number) {
   const [goal] = await db.select({ saved_amount: goalsTable.saved_amount })
     .from(goalsTable)
     .where(eq(goalsTable.id, id));

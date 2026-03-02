@@ -16,7 +16,7 @@ import {
 } from "@/components/ui/dialog";
 import { contributeToGoal } from "@/db/mutations/goals";
 
-export function ContributeGoalDialog({ goalId, goalName }: { goalId: number; goalName: string }) {
+export function ContributeGoalDialog({ goalId, goalName }: { goalId: string; goalName: string }) {
   const [open, setOpen] = useState(false);
   const [isPending, startTransition] = useTransition();
 

@@ -4,7 +4,7 @@ import { DeleteConfirmButton } from "@/components/DeleteConfirmButton";
 import { deleteAccount } from "@/db/mutations/accounts";
 
 type Account = {
-  id: number;
+  id: string;
   accountName: string;
   transactions: number;
 };

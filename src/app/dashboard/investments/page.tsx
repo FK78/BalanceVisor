@@ -47,7 +47,7 @@ type NormalisedHolding = {
   value: number;
   gainLoss: number;
   gainLossPercent: number;
-  manualId?: number;
+  manualId?: string;
 };
 
 export default async function InvestmentsPage() {
@@ -97,7 +97,8 @@ export default async function InvestmentsPage() {
 
   // T212 positions
   for (const pos of t212Positions) {
-    const cost = pos.averagePricePaid * pos.quantity;
+    const avgPrice = parseFloat(String(pos.averagePricePaid));
+    const cost = avgPrice * pos.quantity;
     const value = pos.walletImpact?.currentValue ?? pos.currentPrice * pos.quantity;
     const gainLoss = pos.walletImpact?.profitLoss ?? value - cost;
     const gainLossPercent =
@@ -109,7 +110,7 @@ export default async function InvestmentsPage() {
       ticker: pos.instrument.ticker,
       name: pos.instrument.name ?? pos.instrument.shortName ?? pos.instrument.ticker,
       quantity: pos.quantity,
-      averagePrice: pos.averagePricePaid,
+      averagePrice: avgPrice,
       currentPrice: pos.currentPrice,
       currency: pos.instrument.currencyCode ?? baseCurrency,
       value,

@@ -12,7 +12,7 @@ const splitSelect = {
   description: transactionSplitsTable.description,
 };
 
-export async function getSplitsForTransaction(transactionId: number) {
+export async function getSplitsForTransaction(transactionId: string) {
   return await db
     .select(splitSelect)
     .from(transactionSplitsTable)
@@ -20,8 +20,8 @@ export async function getSplitsForTransaction(transactionId: number) {
     .where(eq(transactionSplitsTable.transaction_id, transactionId));
 }
 
-export async function getSplitsForTransactions(transactionIds: number[]) {
-  if (transactionIds.length === 0) return new Map<number, SplitRow[]>();
+export async function getSplitsForTransactions(transactionIds: string[]) {
+  if (transactionIds.length === 0) return new Map<string, SplitRow[]>();
 
   const rows = await db
     .select(splitSelect)
@@ -29,7 +29,7 @@ export async function getSplitsForTransactions(transactionIds: number[]) {
     .leftJoin(categoriesTable, eq(transactionSplitsTable.category_id, categoriesTable.id))
     .where(inArray(transactionSplitsTable.transaction_id, transactionIds));
 
-  const map = new Map<number, SplitRow[]>();
+  const map = new Map<string, SplitRow[]>();
   for (const row of rows) {
     const existing = map.get(row.transaction_id) ?? [];
     existing.push(row);

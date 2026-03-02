@@ -1,3 +1,3 @@
-export type Account = { id: number; accountName: string };
-export type Category = { id: number; name: string };
-export type CategoryWithColor = { id: number; name: string; color: string };
+export type Account = { id: string; accountName: string };
+export type Category = { id: string; name: string };
+export type CategoryWithColor = { id: string; name: string; color: string };

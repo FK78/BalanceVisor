@@ -86,7 +86,7 @@ export default async function Transactions({
   // Fetch splits for any split transactions on this page
   const splitTxnIds = transactions.filter((t) => t.is_split).map((t) => t.id);
   const splitsMap = await getSplitsForTransactions(splitTxnIds);
-  const serializedSplits: Record<number, { id: number; category_id: number | null; categoryName: string | null; categoryColor: string | null; amount: number; description: string | null }[]> = {};
+  const serializedSplits: Record<string, { id: string; category_id: string | null; categoryName: string | null; categoryColor: string | null; amount: number; description: string | null }[]> = {};
   for (const [txnId, rows] of splitsMap) {
     serializedSplits[txnId] = rows;
   }

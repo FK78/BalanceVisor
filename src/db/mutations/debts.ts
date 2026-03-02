@@ -28,7 +28,7 @@ export async function addDebt(formData: FormData) {
   return result;
 }
 
-export async function editDebt(id: number, formData: FormData) {
+export async function editDebt(id: string, formData: FormData) {
   const remaining = parseFloat(formData.get('remaining_amount') as string);
   const original = parseFloat(formData.get('original_amount') as string);
 
@@ -48,13 +48,13 @@ export async function editDebt(id: number, formData: FormData) {
   revalidatePath('/dashboard');
 }
 
-export async function deleteDebt(id: number) {
+export async function deleteDebt(id: string) {
   await db.delete(debtsTable).where(eq(debtsTable.id, id));
   revalidatePath('/dashboard/debts');
   revalidatePath('/dashboard');
 }
 
-export async function recordDebtPayment(debtId: number, amount: number, date: string, accountId: number, note?: string) {
+export async function recordDebtPayment(debtId: string, amount: number, date: string, accountId: string, note?: string) {
   // Insert payment record
   await db.insert(debtPaymentsTable).values({
     debt_id: debtId,

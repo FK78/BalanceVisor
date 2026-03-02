@@ -25,7 +25,7 @@ import {
 } from "recharts";
 
 type BudgetItem = {
-  id: number;
+  id: string;
   budgetCategory: string;
   budgetColor: string;
   budgetAmount: number;

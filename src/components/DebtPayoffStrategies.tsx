@@ -30,7 +30,7 @@ import { formatCurrency, formatCompactCurrency } from "@/lib/formatCurrency";
 import { Mountain, Snowflake, CalendarCheck, TrendingDown, Info } from "lucide-react";
 
 type Debt = {
-  id: number;
+  id: string;
   name: string;
   remaining_amount: number;
   interest_rate: number;
@@ -45,14 +45,14 @@ type MonthSnapshot = {
   label: string;
   totalRemaining: number;
   totalInterest: number;
-  byDebt: Record<number, number>;
+  byDebt: Record<string, number>;
 };
 
 type PayoffResult = {
   months: number;
   totalInterest: number;
   snapshots: MonthSnapshot[];
-  payoffOrder: { id: number; name: string; month: number }[];
+  payoffOrder: { id: string; name: string; month: number }[];
 };
 
 const MAX_MONTHS = 360; // 30 years cap
@@ -67,22 +67,22 @@ function simulatePayoff(
   }
 
   // Working balances
-  const balances = new Map<number, number>();
+  const balances = new Map<string, number>();
   for (const d of debts) balances.set(d.id, d.remaining_amount);
 
-  const monthlyRates = new Map<number, number>();
+  const monthlyRates = new Map<string, number>();
   for (const d of debts) monthlyRates.set(d.id, d.interest_rate / 100 / 12);
 
-  const minPayments = new Map<number, number>();
+  const minPayments = new Map<string, number>();
   for (const d of debts) minPayments.set(d.id, d.minimum_payment);
 
   const snapshots: MonthSnapshot[] = [];
-  const payoffOrder: { id: number; name: string; month: number }[] = [];
+  const payoffOrder: { id: string; name: string; month: number }[] = [];
   let totalInterestPaid = 0;
   let month = 0;
 
   // Initial snapshot
-  const initialByDebt: Record<number, number> = {};
+  const initialByDebt: Record<string, number> = {};
   for (const d of debts) initialByDebt[d.id] = d.remaining_amount;
   snapshots.push({
     month: 0,
@@ -147,7 +147,7 @@ function simulatePayoff(
 
     // 5. Snapshot (every month for first 24, then quarterly)
     if (month <= 24 || month % 3 === 0 || activeIds.size === 0) {
-      const byDebt: Record<number, number> = {};
+      const byDebt: Record<string, number> = {};
       let totalRemaining = 0;
       for (const d of debts) {
         const bal = Math.max(balances.get(d.id) ?? 0, 0);

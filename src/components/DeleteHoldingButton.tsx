@@ -4,7 +4,7 @@ import { DeleteConfirmButton } from "@/components/DeleteConfirmButton";
 import { deleteManualHolding } from "@/db/mutations/investments";
 
 type Holding = {
-  id: number;
+  id: string;
   ticker: string;
   name: string;
 };

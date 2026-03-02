@@ -15,7 +15,7 @@ import {
 import { importFromTrueLayer, disconnectTrueLayer } from '@/db/mutations/truelayer';
 
 type Connection = {
-  id: number;
+  id: string;
   provider_name: string | null;
   connected_at: Date;
 };
@@ -45,7 +45,7 @@ export function ConnectBankButton({ connections }: { connections: Connection[] }
     });
   }
 
-  function handleDisconnect(connectionId: number) {
+  function handleDisconnect(connectionId: string) {
     startDisconnect(async () => {
       await disconnectTrueLayer(connectionId);
     });
