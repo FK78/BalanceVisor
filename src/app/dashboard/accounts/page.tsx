@@ -11,15 +11,19 @@ import {
   DollarSign,
   PiggyBank,
   TrendingUp,
+  Users,
   Wallet,
 } from "lucide-react";
-import { getAccountsWithDetails } from "@/db/queries/accounts";
+import { getAccountsWithDetails, getSharedAccounts } from "@/db/queries/accounts";
 import { AccountFormDialog } from "@/components/AddAccountForm";
 import { DeleteAccountButton } from "@/components/DeleteAccountButton";
 import { ConnectBankButton } from "@/components/ConnectBankButton";
+import { ShareDialog } from "@/components/ShareDialog";
+import { PendingInvitations } from "@/components/PendingInvitations";
 import { formatCurrency } from "@/lib/formatCurrency";
-import { getCurrentUserId } from "@/lib/auth";
+import { getCurrentUserId, getCurrentUserEmail } from "@/lib/auth";
 import { getUserBaseCurrency } from "@/db/queries/onboarding";
+import { getSharesByOwner, getPendingInvitations } from "@/db/queries/sharing";
 import { AccountCharts } from "@/components/AccountCharts";
 import { getTrueLayerConnections } from "@/db/mutations/truelayer";
 import { getManualHoldings, getTrading212Connection } from "@/db/queries/investments";
@@ -42,13 +46,31 @@ export const typeIcons: Record<string, typeof Wallet> = {
 export default async function Accounts() {
   const userId = await getCurrentUserId();
 
-  const [accounts, baseCurrency, truelayerConnections, manualHoldings, t212Connection] = await Promise.all([
+  const email = await getCurrentUserEmail();
+
+  const [ownedAccounts, sharedAccounts, baseCurrency, truelayerConnections, manualHoldings, t212Connection, pendingInvitations] = await Promise.all([
     getAccountsWithDetails(userId),
+    getSharedAccounts(userId, email),
     getUserBaseCurrency(userId),
     getTrueLayerConnections(),
     getManualHoldings(userId),
     getTrading212Connection(userId),
+    getPendingInvitations(userId, email),
   ]);
+
+  const allShares = await getSharesByOwner(userId);
+
+  const accounts = [...ownedAccounts, ...sharedAccounts];
+  const accountPendingInvitations = pendingInvitations.filter(i => i.resource_type === "account");
+
+  // Build shares map: accountId -> shares[]
+  const accountSharesMap = new Map<string, typeof allShares>();
+  for (const share of allShares) {
+    if (share.resource_type !== "account") continue;
+    const existing = accountSharesMap.get(share.resource_id) ?? [];
+    existing.push(share);
+    accountSharesMap.set(share.resource_id, existing);
+  }
 
   // Build a map of account_id -> count of linked investments
   const investmentCountByAccount = new Map<string, { manual: number; t212: boolean }>();
@@ -89,6 +111,10 @@ export default async function Accounts() {
           <AccountFormDialog />
         </div>
       </div>
+
+      {accountPendingInvitations.length > 0 && (
+        <PendingInvitations invitations={accountPendingInvitations} />
+      )}
 
       {/* Summary row */}
       <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
@@ -181,8 +207,27 @@ export default async function Accounts() {
                   </div>
                   <div className="flex items-center gap-2">
                     <Badge variant={config.variant}>{config.label}</Badge>
-                    <AccountFormDialog account={account} />
-                    <DeleteAccountButton account={account} />
+                    {account.isShared && (
+                      <Badge variant="outline" className="gap-1 text-[10px]">
+                        <Users className="h-3 w-3" />
+                        Shared
+                      </Badge>
+                    )}
+                    {!account.isShared && (
+                      <ShareDialog
+                        resourceType="account"
+                        resourceId={account.id}
+                        resourceName={account.accountName}
+                        existingShares={(accountSharesMap.get(account.id) ?? []).map(s => ({
+                          id: s.id,
+                          shared_with_email: s.shared_with_email,
+                          permission: s.permission,
+                          status: s.status,
+                        }))}
+                      />
+                    )}
+                    {!account.isShared && <AccountFormDialog account={account} />}
+                    {!account.isShared && <DeleteAccountButton account={account} />}
                   </div>
                 </CardHeader>
                 <CardContent>

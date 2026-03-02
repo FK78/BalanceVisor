@@ -1,4 +1,4 @@
-import { boolean, date, integer, pgEnum, pgTable, real, timestamp, varchar, uuid, text } from "drizzle-orm/pg-core";
+import { boolean, date, integer, pgEnum, pgTable, real, timestamp, varchar, uuid, text, uniqueIndex } from "drizzle-orm/pg-core";
 
 export const accountTypeEnum = pgEnum("account_type", ["currentAccount", "savings", "creditCard", "investment"]);
 export const periodEnum = pgEnum("period", ["monthly", "weekly"]);
@@ -204,6 +204,25 @@ export const netWorthSnapshotsTable = pgTable("net_worth_snapshots", {
   investment_value: real("investment_value").notNull().default(0),
   created_at: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
 });
+
+export const sharedResourceTypeEnum = pgEnum("shared_resource_type", ["account", "budget"]);
+export const sharedPermissionEnum = pgEnum("shared_permission", ["view", "edit"]);
+export const sharedStatusEnum = pgEnum("shared_status", ["pending", "accepted", "declined"]);
+
+export const sharedAccessTable = pgTable("shared_access", {
+  id: uuid().primaryKey().defaultRandom(),
+  owner_id: uuid("owner_id").notNull(),
+  shared_with_id: uuid("shared_with_id"),
+  shared_with_email: varchar("shared_with_email", { length: 255 }).notNull(),
+  resource_type: sharedResourceTypeEnum("resource_type").notNull(),
+  resource_id: uuid("resource_id").notNull(),
+  permission: sharedPermissionEnum("permission").notNull().default("edit"),
+  status: sharedStatusEnum("status").notNull().default("pending"),
+  created_at: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
+  accepted_at: timestamp("accepted_at", { withTimezone: true }),
+}, (table) => [{
+  uniqueShare: uniqueIndex("unique_share").on(table.shared_with_email, table.resource_type, table.resource_id),
+}]);
 
 export const alertTypeEnum = pgEnum("alert_type", ["threshold_warning", "over_budget"]);
 

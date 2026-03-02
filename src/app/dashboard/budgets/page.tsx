@@ -12,29 +12,48 @@ import {
   AlertTriangle,
   CheckCircle,
   TrendingUp,
+  Users,
 } from "lucide-react";
-import { getBudgets } from "@/db/queries/budgets";
+import { getBudgets, getSharedBudgets } from "@/db/queries/budgets";
 import { getCategoriesByUser } from "@/db/queries/categories";
 import { formatCurrency } from "@/lib/formatCurrency";
 import { BudgetFormDialog } from "@/components/AddBudgetForm";
 import { DeleteBudgetButton } from "@/components/DeleteBudgetButton";
+import { ShareDialog } from "@/components/ShareDialog";
+import { PendingInvitations } from "@/components/PendingInvitations";
 import { getCategoryIcon } from "@/lib/categoryIcons";
-import { getCurrentUserId } from "@/lib/auth";
+import { getCurrentUserId, getCurrentUserEmail } from "@/lib/auth";
 import { Button } from "@/components/ui/button";
 import { getUserBaseCurrency } from "@/db/queries/onboarding";
 import { BudgetCharts } from "@/components/BudgetCharts";
 import { BudgetAlertSettings } from "@/components/BudgetAlertSettings";
 import { getAlertPreferencesByUser } from "@/db/queries/budget-alerts";
+import { getSharesByOwner, getPendingInvitations } from "@/db/queries/sharing";
 
 export default async function Budgets() {
   const userId = await getCurrentUserId();
+  const email = await getCurrentUserEmail();
   
-  const [budgets, categories, baseCurrency, alertPrefs] = await Promise.all([
+  const [ownedBudgets, sharedBudgetRows, categories, baseCurrency, alertPrefs, allShares, pendingInvitations] = await Promise.all([
     getBudgets(userId),
+    getSharedBudgets(userId, email),
     getCategoriesByUser(userId),
     getUserBaseCurrency(userId),
     getAlertPreferencesByUser(userId),
+    getSharesByOwner(userId),
+    getPendingInvitations(userId, email),
   ]);
+
+  const budgets = [...ownedBudgets, ...sharedBudgetRows];
+  const budgetPendingInvitations = pendingInvitations.filter(i => i.resource_type === "budget");
+
+  const budgetSharesMap = new Map<string, typeof allShares>();
+  for (const share of allShares) {
+    if (share.resource_type !== "budget") continue;
+    const existing = budgetSharesMap.get(share.resource_id) ?? [];
+    existing.push(share);
+    budgetSharesMap.set(share.resource_id, existing);
+  }
 
   const alertPrefsMap = new Map(alertPrefs.map(p => [p.budget_id, p]));
 
@@ -60,6 +79,10 @@ export default async function Budgets() {
           <BudgetFormDialog categories={categories} />
         )}
       </div>
+
+      {budgetPendingInvitations.length > 0 && (
+        <PendingInvitations invitations={budgetPendingInvitations} />
+      )}
 
       {/* Summary */}
       <div className="grid grid-cols-1 gap-4 sm:grid-cols-4">
@@ -192,13 +215,32 @@ export default async function Budgets() {
                       </div>
                     </div>
                     <div className="flex items-center gap-0.5 shrink-0">
+                      {budget.isShared && (
+                        <Badge variant="outline" className="gap-1 text-[10px] mr-1">
+                          <Users className="h-3 w-3" />
+                          Shared
+                        </Badge>
+                      )}
+                      {!budget.isShared && (
+                        <ShareDialog
+                          resourceType="budget"
+                          resourceId={budget.id}
+                          resourceName={budget.budgetCategory}
+                          existingShares={(budgetSharesMap.get(budget.id) ?? []).map(s => ({
+                            id: s.id,
+                            shared_with_email: s.shared_with_email,
+                            permission: s.permission,
+                            status: s.status,
+                          }))}
+                        />
+                      )}
                       <BudgetAlertSettings
                         budgetId={budget.id}
                         budgetCategory={budget.budgetCategory}
                         prefs={alertPrefsMap.get(budget.id) ?? null}
                       />
-                      <BudgetFormDialog categories={categories} budget={budget} />
-                      <DeleteBudgetButton budget={budget} />
+                      {!budget.isShared && <BudgetFormDialog categories={categories} budget={budget} />}
+                      {!budget.isShared && <DeleteBudgetButton budget={budget} />}
                     </div>
                   </div>
 

@@ -18,8 +18,9 @@ import {
   debtPaymentsTable,
   netWorthSnapshotsTable,
   userOnboardingTable,
+  sharedAccessTable,
 } from '@/db/schema';
-import { eq, inArray } from 'drizzle-orm';
+import { eq, or, inArray } from 'drizzle-orm';
 import { revalidatePath } from 'next/cache';
 import { getCurrentUserId } from '@/lib/auth';
 import { createClient } from '@/lib/supabase/server';
@@ -91,6 +92,7 @@ export async function deleteAccount(): Promise<{ success?: boolean; error?: stri
       await tx.delete(debtPaymentsTable).where(inArray(debtPaymentsTable.debt_id, debtIds));
     }
     await tx.delete(debtsTable).where(eq(debtsTable.user_id, userId));
+    await tx.delete(sharedAccessTable).where(or(eq(sharedAccessTable.owner_id, userId), eq(sharedAccessTable.shared_with_id, userId)));
     await tx.delete(netWorthSnapshotsTable).where(eq(netWorthSnapshotsTable.user_id, userId));
     await tx.delete(budgetNotificationsTable).where(eq(budgetNotificationsTable.user_id, userId));
     await tx.delete(budgetAlertPreferencesTable).where(eq(budgetAlertPreferencesTable.user_id, userId));
