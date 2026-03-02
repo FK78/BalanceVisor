@@ -65,6 +65,7 @@ export const transactionsTable = pgTable("transactions", {
   created_at: date().defaultNow(),
   transfer_account_id: integer("transfer_account_id").references(() => accountsTable.id),
   truelayer_id: varchar("truelayer_id", { length: 255 }),
+  is_split: boolean("is_split").notNull().default(false),
 });
 
 export const budgetsTable = pgTable("budgets", {
@@ -143,6 +144,14 @@ export const subscriptionsTable = pgTable("subscriptions", {
   color: varchar({ length: 8 }).notNull().default("#6366f1"),
   icon: varchar({ length: 255 }),
   created_at: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
+});
+
+export const transactionSplitsTable = pgTable("transaction_splits", {
+  id: integer().primaryKey().generatedAlwaysAsIdentity(),
+  transaction_id: integer("transaction_id").notNull().references(() => transactionsTable.id, { onDelete: "cascade" }),
+  category_id: integer("category_id").references(() => categoriesTable.id),
+  amount: real().notNull(),
+  description: text(),
 });
 
 export const netWorthSnapshotsTable = pgTable("net_worth_snapshots", {

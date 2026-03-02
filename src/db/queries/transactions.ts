@@ -24,6 +24,7 @@ const transactionSelect = {
   date: transactionsTable.date,
   is_recurring: transactionsTable.is_recurring,
   transfer_account_id: transactionsTable.transfer_account_id,
+  is_split: transactionsTable.is_split,
 };
 
 function baseTransactionsQuery(userId: string) {

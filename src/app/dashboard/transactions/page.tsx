@@ -8,6 +8,7 @@ import {
 } from "@/db/queries/transactions";
 import { getAccountsWithDetails } from "@/db/queries/accounts";
 import { getCategoriesByUser } from "@/db/queries/categories";
+import { getSplitsForTransactions } from "@/db/queries/transaction-splits";
 import { TransactionsClient } from "@/components/TransactionsClient";
 import { getCurrentUserId } from "@/lib/auth";
 import { getUserBaseCurrency } from "@/db/queries/onboarding";
@@ -62,6 +63,14 @@ export default async function Transactions({
     redirect(`/dashboard/transactions${qs ? `?${qs}` : ""}`);
   }
 
+  // Fetch splits for any split transactions on this page
+  const splitTxnIds = transactions.filter((t) => t.is_split).map((t) => t.id);
+  const splitsMap = await getSplitsForTransactions(splitTxnIds);
+  const serializedSplits: Record<number, { id: number; category_id: number | null; categoryName: string | null; categoryColor: string | null; amount: number; description: string | null }[]> = {};
+  for (const [txnId, rows] of splitsMap) {
+    serializedSplits[txnId] = rows;
+  }
+
   return (
     <TransactionsClient
       transactions={transactions}
@@ -77,6 +86,7 @@ export default async function Transactions({
       dailyTrend={dailyTrend}
       dailyCategoryExpenses={dailyCategoryExpenses}
       currency={baseCurrency}
+      splits={serializedSplits}
     />
   );
 }

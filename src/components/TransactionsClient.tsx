@@ -51,7 +51,8 @@ import {
   SortingState,
   useReactTable,
 } from "@tanstack/react-table";
-import { ArrowDownLeft, ArrowRightLeft, ArrowUpDown, ArrowUpRight, CheckCircle2, Download, Receipt, RefreshCw, Trash2, XCircle } from "lucide-react";
+import { ArrowDownLeft, ArrowRightLeft, ArrowUpDown, ArrowUpRight, CheckCircle2, ChevronDown, ChevronRight, Download, Receipt, RefreshCw, Split, Trash2, XCircle } from "lucide-react";
+import { SplitTransactionDialog } from "@/components/SplitTransactionDialog";
 import { deleteTransaction } from "@/db/mutations/transactions";
 import { formatCurrency } from "@/lib/formatCurrency";
 import { TransactionsInsightsCharts } from "@/components/TransactionsInsightsCharts";
@@ -131,6 +132,16 @@ type Transaction = {
   date: string | null;
   is_recurring: boolean;
   transfer_account_id: number | null;
+  is_split: boolean;
+};
+
+type SplitDetail = {
+  id: number;
+  category_id: number | null;
+  categoryName: string | null;
+  categoryColor: string | null;
+  amount: number;
+  description: string | null;
 };
 
 type Account = { id: number; accountName: string };
@@ -181,6 +192,7 @@ export function TransactionsClient({
   dailyTrend,
   dailyCategoryExpenses,
   currency,
+  splits,
 }: {
   transactions: Transaction[];
   accounts: Account[];
@@ -195,8 +207,10 @@ export function TransactionsClient({
   dailyTrend: DailyCashflowPoint[];
   dailyCategoryExpenses: DailyCategoryExpensePoint[];
   currency: string;
+  splits?: Record<number, SplitDetail[]>;
 }) {
   const router = useRouter();
+  const [expandedSplits, setExpandedSplits] = useState<Set<number>>(new Set());
   const [highlightedIds, setHighlightedIds] = useState<Set<number>>(new Set());
   const [deleteResult, setDeleteResult] = useState<{ status: "success" | "error"; description?: string } | null>(null);
   const [sorting, setSorting] = useState<SortingState>([]);
@@ -371,6 +385,28 @@ export function TransactionsClient({
                 {transferToName ? `→ ${transferToName}` : "Transfer"}
               </Badge>
             )}
+            {t.is_split && (
+              <Badge
+                variant="outline"
+                className="gap-1 cursor-pointer text-violet-600 border-violet-200 hover:bg-violet-50"
+                onClick={() => {
+                  setExpandedSplits((prev) => {
+                    const next = new Set(prev);
+                    if (next.has(t.id)) next.delete(t.id);
+                    else next.add(t.id);
+                    return next;
+                  });
+                }}
+              >
+                <Split className="h-3 w-3" />
+                Split
+                {expandedSplits.has(t.id) ? (
+                  <ChevronDown className="h-3 w-3" />
+                ) : (
+                  <ChevronRight className="h-3 w-3" />
+                )}
+              </Badge>
+            )}
             {t.is_recurring && (
               <Badge variant="secondary" className="gap-1">
                 <RefreshCw className="h-3 w-3" />
@@ -399,7 +435,7 @@ export function TransactionsClient({
         );
       },
     },
-  ]), [accounts, categories, currency, handleTransactionEdited]);
+  ]), [accounts, categories, currency, handleTransactionEdited, expandedSplits]);
 
   // eslint-disable-next-line react-hooks/incompatible-library
   const table = useReactTable({
@@ -440,6 +476,11 @@ export function TransactionsClient({
                 onSaved={(id) => handleTransactionsAdded([id])}
               />
             )}
+            <SplitTransactionDialog
+              accounts={accounts}
+              categories={categories}
+              onSaved={() => router.refresh()}
+            />
             <TransactionFormDialog
               accounts={accounts}
               categories={categories}
@@ -687,25 +728,60 @@ export function TransactionsClient({
                   ))}
                 </TableHeader>
                 <TableBody>
-                  {rows.map((row) => (
-                    <TableRow
-                      key={row.id}
-                      className={
-                        highlightedIds.has(row.original.id)
-                          ? "animate-highlight-row"
-                          : ""
-                      }
-                    >
-                      {row.getVisibleCells().map((cell) => (
-                        <TableCell
-                          key={cell.id}
-                          className={cell.column.id === "amount" ? "text-right" : undefined}
+                  {rows.map((row) => {
+                    const t = row.original;
+                    const txnSplits = splits?.[t.id];
+                    const isExpanded = expandedSplits.has(t.id);
+                    return (
+                      <>
+                        <TableRow
+                          key={row.id}
+                          className={
+                            highlightedIds.has(t.id)
+                              ? "animate-highlight-row"
+                              : ""
+                          }
                         >
-                          {flexRender(cell.column.columnDef.cell, cell.getContext())}
-                        </TableCell>
-                      ))}
-                    </TableRow>
-                  ))}
+                          {row.getVisibleCells().map((cell) => (
+                            <TableCell
+                              key={cell.id}
+                              className={cell.column.id === "amount" ? "text-right" : undefined}
+                            >
+                              {flexRender(cell.column.columnDef.cell, cell.getContext())}
+                            </TableCell>
+                          ))}
+                        </TableRow>
+                        {t.is_split && isExpanded && txnSplits && txnSplits.length > 0 && (
+                          <TableRow key={`${row.id}-splits`} className="bg-muted/30 hover:bg-muted/40">
+                            <TableCell colSpan={columns.length} className="py-2 px-6">
+                              <div className="space-y-1.5">
+                                <p className="text-xs font-medium text-muted-foreground mb-1">Split breakdown</p>
+                                {txnSplits.map((s: SplitDetail) => (
+                                  <div key={s.id} className="flex items-center justify-between text-xs">
+                                    <div className="flex items-center gap-2">
+                                      {s.categoryColor && (
+                                        <span
+                                          className="h-2 w-2 rounded-full"
+                                          style={{ backgroundColor: s.categoryColor }}
+                                        />
+                                      )}
+                                      <span className="font-medium">{s.categoryName ?? "Uncategorised"}</span>
+                                      {s.description && (
+                                        <span className="text-muted-foreground">— {s.description}</span>
+                                      )}
+                                    </div>
+                                    <span className="font-mono tabular-nums font-medium">
+                                      {formatCurrency(s.amount, currency)}
+                                    </span>
+                                  </div>
+                                ))}
+                              </div>
+                            </TableCell>
+                          </TableRow>
+                        )}
+                      </>
+                    );
+                  })}
                 </TableBody>
               </Table>
               <div className="mt-4 flex flex-col gap-3 border-t pt-4 sm:flex-row sm:items-center sm:justify-between">
