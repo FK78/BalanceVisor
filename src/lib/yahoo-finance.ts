@@ -10,15 +10,33 @@ export type YahooQuote = {
   currency: string;
 };
 
+// Currencies that represent sub-units (pence, cents, etc.)
+// Yahoo Finance returns "GBp" for UK stocks priced in pence
+const SUB_UNIT_CURRENCIES: Record<string, { major: string; divisor: number }> = {
+  GBp: { major: "GBP", divisor: 100 },
+  GBX: { major: "GBP", divisor: 100 },
+  ZAc: { major: "ZAR", divisor: 100 },
+};
+
 export async function getQuote(ticker: string): Promise<YahooQuote | null> {
   try {
     const result: any = await yahooFinance.quote(ticker);
     if (!result || !result.regularMarketPrice) return null;
+
+    let price = result.regularMarketPrice;
+    let currency = result.currency ?? "USD";
+
+    const subUnit = SUB_UNIT_CURRENCIES[currency];
+    if (subUnit) {
+      price = price / subUnit.divisor;
+      currency = subUnit.major;
+    }
+
     return {
       ticker: result.symbol,
       name: result.shortName ?? result.longName ?? ticker,
-      currentPrice: result.regularMarketPrice,
-      currency: result.currency ?? "USD",
+      currentPrice: price,
+      currency,
     };
   } catch {
     return null;
