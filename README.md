@@ -1,8 +1,8 @@
 <p align="center">
-  <img src="public/logo.svg" alt="Flowdget logo" width="120" height="120" />
+  <img src="public/logo.svg" alt="BalanceVisor logo" width="120" height="120" />
 </p>
 
-<h1 align="center">Flowdget</h1>
+<h1 align="center">BalanceVisor</h1>
 
 <p align="center">A personal finance dashboard for tracking accounts, budgets, transactions, investments, and savings goals — built with <strong>Next.js 16</strong>, <strong>Drizzle ORM</strong>, and <strong>Supabase Postgres</strong>.</p>
 
@@ -110,8 +110,8 @@ src/
 1. **Clone the repo**
 
    ```bash
-   git clone https://github.com/FK78/flowdget.git
-   cd flowdget
+   git clone https://github.com/FK78/balancevisor.git
+   cd balancevisor
    ```
 
 2. **Install dependencies**

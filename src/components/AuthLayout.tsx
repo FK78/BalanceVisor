@@ -27,8 +27,8 @@ export function AuthLayout({
         <div className="absolute bottom-20 left-10 -z-10 h-64 w-64 rounded-full bg-amber-200/10 blur-3xl" />
 
         <Link href="/" className="flex items-center gap-2.5 font-bold text-lg">
-          <Image src="/logo.svg" alt="Flowdget" width={32} height={32} />
-          <span>Flowdget</span>
+          <Image src="/logo.svg" alt="BalanceVisor" width={32} height={32} />
+          <span>BalanceVisor</span>
         </Link>
 
         <div className="space-y-6">
@@ -56,7 +56,7 @@ export function AuthLayout({
         </div>
 
         <p className="text-xs text-muted-foreground">
-          &copy; {new Date().getFullYear()} Flowdget. Free forever.
+          &copy; {new Date().getFullYear()} BalanceVisor. Free forever.
         </p>
       </div>
 
@@ -71,8 +71,8 @@ export function AuthLayout({
 
         {/* Logo on mobile only */}
         <div className="mb-8 flex items-center gap-2.5 lg:hidden">
-          <Image src="/logo.svg" alt="Flowdget" width={30} height={30} />
-          <span className="text-lg font-bold">Flowdget</span>
+          <Image src="/logo.svg" alt="BalanceVisor" width={30} height={30} />
+          <span className="text-lg font-bold">BalanceVisor</span>
         </div>
 
         <div className="w-full max-w-sm">

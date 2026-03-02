@@ -1,5 +1,5 @@
-const CACHE_NAME = "flowdget-v3";
-const FONT_CACHE = "flowdget-fonts-v1";
+const CACHE_NAME = "balancevisor-v3";
+const FONT_CACHE = "balancevisor-fonts-v1";
 const OFFLINE_URL = "/offline.html";
 
 const PRECACHE_URLS = [

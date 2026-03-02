@@ -165,8 +165,8 @@ export default function Home() {
       <nav className="sticky top-0 z-50 border-b border-border/60 bg-background/80 backdrop-blur-lg">
         <div className="mx-auto flex max-w-6xl items-center justify-between px-6 py-3">
           <Link href="/" className="flex items-center gap-2.5 font-bold text-lg">
-            <Image src="/logo.svg" alt="Flowdget logo" width={30} height={30} />
-            <span>Flowdget</span>
+            <Image src="/logo.svg" alt="BalanceVisor logo" width={30} height={30} />
+            <span>BalanceVisor</span>
           </Link>
           <div className="flex items-center gap-2">
             <Button asChild size="sm" variant="ghost">
@@ -197,7 +197,7 @@ export default function Home() {
             </span>
           </h1>
           <p className="animate-fade-in-up mx-auto mt-6 max-w-xl text-lg leading-relaxed text-muted-foreground" style={{ animationDelay: "0.2s" }}>
-            Flowdget helps you track spending, set budgets, manage investments,
+            BalanceVisor helps you track spending, set budgets, manage investments,
             crush savings goals, and see your full financial picture in one beautifully simple dashboard.
           </p>
           <div className="animate-fade-in-up mt-10 flex flex-col items-center gap-3 sm:flex-row sm:justify-center" style={{ animationDelay: "0.3s" }}>
@@ -295,7 +295,7 @@ export default function Home() {
             <div>
               <h3 className="text-xl font-bold">Your data stays yours</h3>
               <p className="mt-2 text-sm leading-relaxed text-muted-foreground">
-                Flowdget uses Supabase with row-level security — your financial data is
+                BalanceVisor uses Supabase with row-level security — your financial data is
                 isolated and encrypted. We don&apos;t sell data, serve ads, or share anything
                 with third parties. Ever.
               </p>
@@ -311,7 +311,7 @@ export default function Home() {
             Ready to take control?
           </h2>
           <p className="mt-4 text-lg text-muted-foreground">
-            Join Flowdget today — it takes less than a minute and
+            Join BalanceVisor today — it takes less than a minute and
             it&apos;s completely free. No catches.
           </p>
           <div className="mt-10 flex flex-col items-center gap-3 sm:flex-row sm:justify-center">
@@ -328,8 +328,8 @@ export default function Home() {
       <footer className="border-t border-border/60 px-6 py-10">
         <div className="mx-auto flex max-w-6xl flex-col items-center justify-between gap-4 sm:flex-row">
           <div className="flex items-center gap-2.5 text-sm font-bold">
-            <Image src="/logo.svg" alt="Flowdget" width={22} height={22} />
-            Flowdget
+            <Image src="/logo.svg" alt="BalanceVisor" width={22} height={22} />
+            BalanceVisor
           </div>
           <div className="flex gap-6 text-sm text-muted-foreground">
             <Link href="/auth/login" className="hover:text-foreground transition-colors">Sign In</Link>
