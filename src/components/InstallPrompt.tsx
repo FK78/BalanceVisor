@@ -27,6 +27,16 @@ export function InstallPrompt() {
       return;
     }
 
+    // Check if the event was already captured at root level (ServiceWorkerRegistrar)
+    if (window.__pwaInstallPrompt) {
+      queueMicrotask(() => {
+        setDeferredPrompt(window.__pwaInstallPrompt as BeforeInstallPromptEvent);
+        setVisible(true);
+      });
+      return;
+    }
+
+    // Otherwise listen for it (in case it fires after this component mounts)
     const handler = (e: Event) => {
       e.preventDefault();
       setDeferredPrompt(e as BeforeInstallPromptEvent);
