@@ -1,7 +1,7 @@
 'use server';
 
 import { db } from '@/index';
-import { accountsTable, transactionsTable } from '@/db/schema';
+import { accountsTable, transactionsTable, transactionSplitsTable } from '@/db/schema';
 import { revalidatePath } from 'next/cache';
 import { eq, sql } from 'drizzle-orm';
 import { getCurrentUserId } from '@/lib/auth';
@@ -211,4 +211,61 @@ export async function deleteTransaction(id: number) {
 
   revalidatePath('/dashboard/transactions');
   revalidatePath('/dashboard/accounts');
+}
+
+export type SplitInput = {
+  category_id: number | null;
+  amount: number;
+  description: string;
+};
+
+export async function addSplitTransaction(
+  type: 'income' | 'expense',
+  totalAmount: number,
+  description: string,
+  accountId: number,
+  txnDate: string,
+  splits: SplitInput[],
+) {
+  const userId = await getCurrentUserId();
+
+  // Create parent transaction with is_split = true, no single category
+  const [parent] = await db.insert(transactionsTable).values({
+    type,
+    amount: totalAmount,
+    description: encrypt(description),
+    is_recurring: false,
+    date: txnDate,
+    account_id: accountId,
+    category_id: null,
+    recurring_pattern: null,
+    next_recurring_date: null,
+    is_split: true,
+  }).returning({ id: transactionsTable.id });
+
+  // Insert splits
+  if (splits.length > 0) {
+    await db.insert(transactionSplitsTable).values(
+      splits.map((s) => ({
+        transaction_id: parent.id,
+        category_id: s.category_id,
+        amount: s.amount,
+        description: s.description ? encrypt(s.description) : null,
+      }))
+    );
+  }
+
+  // Update account balance
+  const delta = type === 'income' ? totalAmount : -totalAmount;
+  await db.update(accountsTable)
+    .set({ balance: sql`${accountsTable.balance} + ${delta}` })
+    .where(eq(accountsTable.id, accountId));
+
+  revalidatePath('/dashboard/transactions');
+  revalidatePath('/dashboard/accounts');
+  revalidatePath('/dashboard');
+
+  await checkBudgetAlerts(userId);
+
+  return parent;
 }
