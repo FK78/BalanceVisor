@@ -9,7 +9,7 @@ interface BeforeInstallPromptEvent extends Event {
   userChoice: Promise<{ outcome: "accepted" | "dismissed" }>;
 }
 
-const DISMISS_KEY = "flowdget-install-dismissed";
+const DISMISS_KEY = "balancevisor-install-dismissed";
 const DISMISS_DURATION_MS = 7 * 24 * 60 * 60 * 1000; // 7 days
 
 export function InstallPrompt() {
@@ -61,7 +61,7 @@ export function InstallPrompt() {
           <Download className="h-5 w-5 text-primary" />
         </div>
         <div className="flex-1 min-w-0">
-          <p className="text-sm font-semibold">Install Flowdget</p>
+          <p className="text-sm font-semibold">Install BalanceVisor</p>
           <p className="text-xs text-muted-foreground mt-0.5">
             Add to your home screen for quick access and a native app experience.
           </p>

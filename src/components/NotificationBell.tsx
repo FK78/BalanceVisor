@@ -47,7 +47,7 @@ export function NotificationBell({
     if (permissionState === "granted" && unreadCount > 0) {
       const latest = notifications.find((n) => !n.is_read);
       if (latest) {
-        new Notification("Flowdget Budget Alert", {
+        new Notification("BalanceVisor Budget Alert", {
           body: latest.message,
           icon: "/favicon.ico",
           tag: `budget-alert-${latest.id}`,
