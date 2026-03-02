@@ -1,4 +1,4 @@
-import { openai } from "@ai-sdk/openai";
+import { groq } from "@ai-sdk/groq";
 import { streamText, convertToModelMessages } from "ai";
 import type { UIMessage } from "ai";
 import { getCurrentUserId } from "@/lib/auth";
@@ -122,7 +122,7 @@ ${upcomingRenewals.map((s) => `- ${s.name}: ${formatCurrency(s.amount, baseCurre
 `.trim();
 
   const result = streamText({
-    model: openai("gpt-4o-mini"),
+    model: groq("llama-3.3-70b-versatile"),
     system: `You are BalanceVisor AI, a helpful and knowledgeable personal finance assistant embedded in the user's finance dashboard. You have access to the user's real financial data shown below.
 
 Your role:

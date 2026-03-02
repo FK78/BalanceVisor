@@ -10,6 +10,7 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import { TransactionFormDialog } from "@/components/AddTransactionForm";
+import { QuickAddTransaction } from "@/components/QuickAddTransaction";
 import { TransferFormDialog } from "@/components/AddTransferForm";
 import { ImportCSVDialog } from "@/components/ImportCSVDialog";
 import {
@@ -479,6 +480,9 @@ export function TransactionsClient({
               categories={categories}
               onSaved={() => router.refresh()}
             />
+            <QuickAddTransaction
+              onSaved={handleTransactionsAdded}
+            />
             <TransactionFormDialog
               accounts={accounts}
               categories={categories}
@@ -739,59 +743,60 @@ export function TransactionsClient({
                   ))}
                 </TableHeader>
                 <TableBody>
-                  {rows.map((row) => {
+                  {rows.flatMap((row) => {
                     const t = row.original;
                     const txnSplits = splits?.[t.id];
                     const isExpanded = expandedSplits.has(t.id);
-                    return (
-                      <>
-                        <TableRow
-                          key={row.id}
-                          className={
-                            highlightedIds.has(t.id)
-                              ? "animate-highlight-row"
-                              : ""
-                          }
-                        >
-                          {row.getVisibleCells().map((cell) => (
-                            <TableCell
-                              key={cell.id}
-                              className={cell.column.id === "amount" ? "text-right" : undefined}
-                            >
-                              {flexRender(cell.column.columnDef.cell, cell.getContext())}
-                            </TableCell>
-                          ))}
-                        </TableRow>
-                        {t.is_split && isExpanded && txnSplits && txnSplits.length > 0 && (
-                          <TableRow key={`${row.id}-splits`} className="bg-muted/30 hover:bg-muted/40">
-                            <TableCell colSpan={columns.length} className="py-2 px-6">
-                              <div className="space-y-1.5">
-                                <p className="text-xs font-medium text-muted-foreground mb-1">Split breakdown</p>
-                                {txnSplits.map((s: SplitDetail) => (
-                                  <div key={s.id} className="flex items-center justify-between text-xs">
-                                    <div className="flex items-center gap-2">
-                                      {s.categoryColor && (
-                                        <span
-                                          className="h-2 w-2 rounded-full"
-                                          style={{ backgroundColor: s.categoryColor }}
-                                        />
-                                      )}
-                                      <span className="font-medium">{s.categoryName ?? "Uncategorised"}</span>
-                                      {s.description && (
-                                        <span className="text-muted-foreground">— {s.description}</span>
-                                      )}
-                                    </div>
-                                    <span className="font-mono tabular-nums font-medium">
-                                      {formatCurrency(s.amount, currency)}
-                                    </span>
+                    const elements = [
+                      <TableRow
+                        key={row.id}
+                        className={
+                          highlightedIds.has(t.id)
+                            ? "animate-highlight-row"
+                            : ""
+                        }
+                      >
+                        {row.getVisibleCells().map((cell) => (
+                          <TableCell
+                            key={cell.id}
+                            className={cell.column.id === "amount" ? "text-right" : undefined}
+                          >
+                            {flexRender(cell.column.columnDef.cell, cell.getContext())}
+                          </TableCell>
+                        ))}
+                      </TableRow>,
+                    ];
+                    if (t.is_split && isExpanded && txnSplits && txnSplits.length > 0) {
+                      elements.push(
+                        <TableRow key={`${row.id}-splits`} className="bg-muted/30 hover:bg-muted/40">
+                          <TableCell colSpan={columns.length} className="py-2 px-6">
+                            <div className="space-y-1.5">
+                              <p className="text-xs font-medium text-muted-foreground mb-1">Split breakdown</p>
+                              {txnSplits.map((s: SplitDetail) => (
+                                <div key={s.id} className="flex items-center justify-between text-xs">
+                                  <div className="flex items-center gap-2">
+                                    {s.categoryColor && (
+                                      <span
+                                        className="h-2 w-2 rounded-full"
+                                        style={{ backgroundColor: s.categoryColor }}
+                                      />
+                                    )}
+                                    <span className="font-medium">{s.categoryName ?? "Uncategorised"}</span>
+                                    {s.description && (
+                                      <span className="text-muted-foreground">— {s.description}</span>
+                                    )}
                                   </div>
-                                ))}
-                              </div>
-                            </TableCell>
-                          </TableRow>
-                        )}
-                      </>
-                    );
+                                  <span className="font-mono tabular-nums font-medium">
+                                    {formatCurrency(s.amount, currency)}
+                                  </span>
+                                </div>
+                              ))}
+                            </div>
+                          </TableCell>
+                        </TableRow>,
+                      );
+                    }
+                    return elements;
                   })}
                 </TableBody>
               </Table>
