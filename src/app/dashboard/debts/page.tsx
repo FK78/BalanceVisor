@@ -16,6 +16,7 @@ import { DeleteConfirmButton } from "@/components/DeleteConfirmButton";
 import { deleteDebt } from "@/db/mutations/debts";
 import { Badge } from "@/components/ui/badge";
 import { CreditCard, CheckCircle2, TrendingDown, Percent } from "lucide-react";
+import { DebtPayoffStrategies } from "@/components/DebtPayoffStrategies";
 
 export default async function DebtsPage() {
   const userId = await getCurrentUserId();
@@ -246,6 +247,21 @@ export default async function DebtsPage() {
             );
           })}
         </div>
+      )}
+      {/* Payoff strategies */}
+      {active.length >= 2 && (
+        <DebtPayoffStrategies
+          debts={active.map((d) => ({
+            id: d.id,
+            name: d.name,
+            remaining_amount: d.remaining_amount,
+            interest_rate: d.interest_rate,
+            minimum_payment: d.minimum_payment,
+            color: d.color,
+          }))}
+          totalMinimumPayment={totalMinimumPayment}
+          currency={baseCurrency}
+        />
       )}
     </div>
   );
