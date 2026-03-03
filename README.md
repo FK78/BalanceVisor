@@ -4,50 +4,78 @@
 
 <h1 align="center">BalanceVisor</h1>
 
-<p align="center">A personal finance dashboard for tracking accounts, budgets, transactions, investments, and savings goals — built with <strong>Next.js 16</strong>, <strong>Drizzle ORM</strong>, and <strong>Supabase Postgres</strong>.</p>
+<p align="center">
+  Personal finance dashboard — accounts, budgets, transactions, investments, goals, debt tracking, and an AI assistant.<br/>
+  Next.js 16 · Drizzle ORM · Supabase · Groq AI
+</p>
+
+---
+
+## What it does
+
+BalanceVisor is a full-stack personal finance app. You connect your bank (TrueLayer Open Banking) or add accounts manually, and the app tracks everything from daily spending to long-term investment performance. There's an AI assistant powered by Groq that can parse natural language into transactions and auto-categorise spending.
 
 ## Features
 
-### Core
-- **Dashboard** — Net worth (accounts + investments), summary cards with month-over-month trends, recent transactions, spending by category, cashflow charts, budget progress, and savings goals at a glance
-- **Accounts** — CRUD for current accounts, savings, credit cards, and investment accounts with automatic balance adjustment on transaction changes
-- **Transactions** — Income and expense tracking with category labels, account attribution, recurring patterns (daily/weekly/biweekly/monthly/yearly), CSV import, and data export
-- **Categories** — Custom spending categories with icons, colours, and auto-categorisation rules for imported transactions
-- **Budgets** — Monthly or weekly spending limits per category with progress tracking, threshold alerts (browser + email via Resend), and notification bell
-- **Goals** — Savings goals with target amounts, deadlines, contribution tracking, and progress visualisation
+**Dashboard** — Net worth across accounts + investments, month-over-month trends, recent transactions, spending breakdown, cashflow chart, budget progress bars, and savings goals.
+
+**Accounts** — Current accounts, savings, credit cards, investments. Balances auto-adjust when transactions are added/edited/deleted.
+
+**Transactions** — Income/expense tracking with categories, recurring patterns (daily/weekly/biweekly/monthly/yearly), CSV import with column mapping, and data export. Split transactions supported.
+
+**Categories** — Custom categories with colours and icons. Rule-based auto-categorisation with AI fallback (Groq) for imported or manually entered transactions.
+
+**Budgets** — Monthly or weekly spending limits per category. Threshold alerts via browser notifications and email (Resend). Notification bell in the navbar.
+
+**Goals** — Savings goals with target amounts, deadlines, and contribution tracking.
+
+**Debt Tracker** — Track debts with interest rates, minimum payments, and payoff progress.
+
+**Subscriptions** — Recurring subscription tracking.
+
+**Reports** — Spending insights and analytics.
+
+### AI
+
+- **Smart Categorisation** — When no rule matches a transaction, Groq's `openai/gpt-oss-20b` picks the best category from the user's list. Falls back gracefully if the API is down or no key is configured.
+- **Natural Language Transactions** — Type something like "£45 Tesco groceries yesterday" and the AI parses it into a structured transaction with the right account, category, amount, and date. Powered by the `/api/parse-transaction` route.
+- **Chat Assistant** — Conversational AI in a slide-out panel for financial questions, accessible from any dashboard page.
 
 ### Investments
-- **Trading 212** — Connect via API key to sync account summary and open positions in real-time (Live and Demo environments)
-- **Manual Holdings** — Search tickers via Yahoo Finance, track quantity and cost basis, auto-refresh prices when stale (>15 min)
-- **Portfolio View** — Summary cards (total value, gain/loss, cost basis), allocation pie chart, per-holding gain/loss bar chart, unified holdings table
+
+- **Trading 212** — Connect with your API key + secret (HTTP Basic Auth). Syncs account summary and open positions for both Live and Demo environments.
+- **Manual Holdings** — Search tickers via Yahoo Finance, track quantity and cost basis. Prices auto-refresh when stale (>15 min).
+- **Investment Groups** — Organise holdings into custom groups with colours and icons.
+- **Portfolio View** — Total value, gain/loss, cost basis cards. Allocation pie chart, per-holding bar chart, unified holdings table.
 
 ### Open Banking
-- **TrueLayer Integration** — Link bank accounts via OAuth, sync accounts and transactions automatically (sandbox and production)
+
+- **TrueLayer** — OAuth flow to link UK bank accounts. Accounts and transactions import automatically on connect and on every login (hourly throttle). Manual "Sync Now" button as fallback. Supports sandbox and production environments.
+
+### PWA
+
+Installable as a Progressive Web App on mobile and desktop. Service worker provides offline fallback, font caching, and stale-while-revalidate for static assets. Custom install prompt with dismiss-and-remember logic.
 
 ### Security
-- **Encryption at Rest** — Account names, transaction descriptions, TrueLayer tokens, and Trading 212 API keys encrypted with AES-256-GCM
-- **Migration Script** — One-time script to encrypt existing plaintext data in-place
 
-### Other
-- **Onboarding** — Guided setup flow for base currency, accounts, categories, and budgets with skip options
-- **Authentication** — Supabase Auth with login, sign-up, password reset, and email confirmation
-- **Dark Mode** — Theme toggle with system preference support
-- **Responsive** — Mobile-first layout with adaptive navbar (shadcn dropdowns)
+All sensitive data encrypted at rest with AES-256-GCM: account names, transaction descriptions, TrueLayer OAuth tokens, Trading 212 API credentials. Encryption key stored as an environment variable, never committed.
 
 ## Tech Stack
 
-| Layer         | Technology                                            |
-| ------------- | ----------------------------------------------------- |
-| Framework     | Next.js 16 (App Router, Server Components)            |
-| Language      | TypeScript                                            |
-| Database      | PostgreSQL via Supabase                               |
-| ORM           | Drizzle ORM + Drizzle Kit                             |
-| DB Driver     | postgres.js                                           |
-| Auth          | Supabase Auth (SSR)                                   |
-| Styling       | Tailwind CSS 4                                        |
-| UI Components | shadcn/ui, Radix UI, Lucide icons                     |
-| Charts        | Recharts                                              |
-| Integrations  | TrueLayer (open banking), Trading 212, Yahoo Finance  |
+| Layer | Tech |
+| --- | --- |
+| Framework | Next.js 16 (App Router, Server Components, Turbopack) |
+| Language | TypeScript |
+| Database | PostgreSQL (Supabase) |
+| ORM | Drizzle ORM |
+| Auth | Supabase Auth (SSR) |
+| AI | Vercel AI SDK v6, Groq (`openai/gpt-oss-20b`) |
+| Styling | Tailwind CSS 4 |
+| Components | shadcn/ui, Radix UI, Lucide |
+| Charts | Recharts |
+| Tables | TanStack Table |
+| Banking | TrueLayer Open Banking |
+| Investments | Trading 212 API, Yahoo Finance |
 
 ## Project Structure
 
@@ -55,47 +83,49 @@
 src/
 ├── app/
 │   ├── api/
-│   │   └── truelayer/          # OAuth connect + callback routes
-│   ├── auth/                   # Login, sign-up, password reset pages
+│   │   ├── chat/               # AI chat assistant route (streaming)
+│   │   ├── parse-transaction/  # NL → structured transaction route
+│   │   └── truelayer/          # OAuth connect + callback
+│   ├── auth/                   # Login, sign-up, password reset
 │   ├── dashboard/
-│   │   ├── accounts/           # Accounts page
-│   │   ├── budgets/            # Budgets page
+│   │   ├── accounts/
+│   │   ├── budgets/
 │   │   ├── categories/         # Categories + auto-categorisation rules
-│   │   ├── goals/              # Savings goals page
-│   │   ├── investments/        # Portfolio page (T212 + manual holdings)
-│   │   ├── transactions/       # Transactions page + CSV export
-│   │   ├── layout.tsx          # Dashboard shell & navbar
-│   │   └── page.tsx            # Dashboard overview
-│   ├── onboarding/             # Guided first-run setup
+│   │   ├── goals/
+│   │   ├── investments/        # T212 + manual holdings
+│   │   ├── transactions/       # Table, CSV import/export
+│   │   ├── layout.tsx          # Shell, navbar, bank sync trigger
+│   │   └── page.tsx            # Overview
+│   ├── onboarding/             # First-run setup wizard
 │   └── page.tsx                # Landing page
 ├── components/
 │   ├── ui/                     # shadcn/ui primitives
-│   ├── *Charts.tsx             # Recharts wrappers (cashflow, budgets, categories, investments, accounts)
-│   ├── DashboardNav.tsx        # Responsive nav with dropdown menus
-│   ├── ConnectBankButton.tsx   # TrueLayer open banking
+│   ├── BankSyncTrigger.tsx     # Background auto-sync on login
+│   ├── ChatPanel.tsx           # AI assistant slide-out
+│   ├── ConnectBankButton.tsx   # TrueLayer open banking dialog
 │   ├── ConnectTrading212Dialog.tsx
-│   ├── AddHoldingDialog.tsx    # Manual investment entry with ticker search
-│   ├── ImportCSVDialog.tsx     # CSV transaction import with column mapping
-│   ├── NotificationBell.tsx    # Budget alert notifications
-│   └── ...                     # Form dialogs, delete buttons, auth forms
+│   ├── InstallPrompt.tsx       # PWA install banner
+│   ├── ServiceWorkerRegistrar.tsx
+│   └── ...
 ├── db/
 │   ├── schema.ts               # Drizzle table definitions
-│   ├── queries/                # Read-only data access (per domain)
-│   ├── mutations/              # Server actions (writes + revalidation)
+│   ├── queries/                # Read-only data access
+│   ├── mutations/              # Server actions (writes)
 │   └── migrations/             # One-off migration scripts
 ├── lib/
-│   ├── encryption.ts           # AES-256-GCM encrypt/decrypt/isEncrypted
-│   ├── investment-value.ts     # Shared investment value calculator
-│   ├── trading212.ts           # Trading 212 API client
+│   ├── auto-categorise.ts      # Rule matching + AI fallback
+│   ├── encryption.ts           # AES-256-GCM
+│   ├── trading212.ts           # T212 API client (Basic Auth)
 │   ├── truelayer.ts            # TrueLayer API client
-│   ├── yahoo-finance.ts        # Yahoo Finance quote + search
-│   ├── budget-alerts.ts        # Alert threshold checks + email dispatch
-│   ├── recurring-transactions.ts # Auto-generate due recurring transactions
-│   ├── auto-categorise.ts      # Pattern-based category matching
-│   ├── insights.ts             # Spending insights generator
-│   ├── supabase/               # Supabase client (server, browser, middleware)
-│   └── ...                     # Formatters, date helpers, utils
-└── index.ts                    # Shared DB instance (postgres.js driver)
+│   ├── yahoo-finance.ts        # Quote + ticker search
+│   ├── budget-alerts.ts        # Threshold checks + email
+│   ├── recurring-transactions.ts
+│   └── supabase/               # Server, browser, middleware clients
+├── public/
+│   ├── manifest.json           # PWA manifest
+│   ├── sw.js                   # Service worker
+│   └── icons/                  # App icons (192, 512, maskable)
+└── index.ts                    # Shared DB instance
 ```
 
 ## Getting Started
@@ -103,94 +133,86 @@ src/
 ### Prerequisites
 
 - Node.js 20+
-- A [Supabase](https://supabase.com) project (or any PostgreSQL instance)
+- A [Supabase](https://supabase.com) project (or any Postgres instance)
 
 ### Setup
 
-1. **Clone the repo**
+```bash
+git clone https://github.com/FK78/BalanceVisor.git
+cd BalanceVisor
+npm install
+cp .env.example .env
+```
 
-   ```bash
-   git clone https://github.com/FK78/balancevisor.git
-   cd balancevisor
-   ```
+Fill in `.env`:
 
-2. **Install dependencies**
+| Variable | Required | Notes |
+| --- | --- | --- |
+| `DATABASE_URL` | Yes | Supabase Postgres connection string |
+| `NEXT_PUBLIC_SUPABASE_URL` | Yes | Supabase project URL |
+| `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY` | Yes | Supabase anon key |
+| `NEXT_PUBLIC_SITE_URL` | Yes | `http://localhost:3000` for dev |
+| `ENCRYPTION_KEY` | Yes | 32-byte hex — see below |
+| `GROQ_API_KEY` | No | Enables AI categorisation + NL transactions + chat |
+| `RESEND_API_KEY` | No | Email budget alerts |
+| `TRUELAYER_CLIENT_ID` | No | Open banking |
+| `TRUELAYER_CLIENT_SECRET` | No | Open banking |
+| `TRUELAYER_SANDBOX` | No | Set `true` for sandbox mode |
 
-   ```bash
-   npm install
-   ```
+Generate an encryption key:
 
-3. **Configure environment variables**
+```bash
+node -e "console.log(require('crypto').randomBytes(32).toString('hex'))"
+```
 
-   ```bash
-   cp .env.example .env
-   ```
+Push the schema to your database:
 
-   Fill in the required values:
+```bash
+npx drizzle-kit push
+```
 
-   | Variable | Required | Description |
-   | -------- | -------- | ----------- |
-   | `DATABASE_URL` | Yes | Supabase Postgres connection string (Transaction pooler, port 6543) |
-   | `NEXT_PUBLIC_SUPABASE_URL` | Yes | Supabase project URL |
-   | `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY` | Yes | Supabase anon/publishable key |
-   | `NEXT_PUBLIC_SITE_URL` | Yes | App URL (`http://localhost:3000` for dev) |
-   | `ENCRYPTION_KEY` | Yes | 32-byte hex key for AES-256-GCM encryption |
-   | `RESEND_API_KEY` | No | Resend API key for email budget alerts |
-   | `TRUELAYER_CLIENT_ID` | No | TrueLayer app credentials for open banking |
-   | `TRUELAYER_CLIENT_SECRET` | No | TrueLayer app credentials for open banking |
+Start the dev server:
 
-   Generate an encryption key:
+```bash
+npm run dev
+```
 
-   ```bash
-   node -e "console.log(require('crypto').randomBytes(32).toString('hex'))"
-   ```
-
-4. **Create tables & seed the database**
-
-   Run the full `seed.sql` in the Supabase SQL Editor or via CLI:
-
-   ```bash
-   psql $DATABASE_URL -f seed.sql
-   ```
-
-   This creates all tables, enums, and inserts default category templates.
-
-5. **Run the dev server**
-
-   ```bash
-   npm run dev
-   ```
-
-   Open [http://localhost:3000](http://localhost:3000).
+Open [http://localhost:3000](http://localhost:3000).
 
 ## Scripts
 
-| Command           | Description                                |
-| ----------------- | ------------------------------------------ |
-| `npm run dev`     | Start the development server               |
-| `npm run build`   | Create a production build                  |
-| `npm run start`   | Serve the production build                 |
-| `npm run lint`    | Run ESLint                                 |
+| Command | Description |
+| --- | --- |
+| `npm run dev` | Dev server (Turbopack) |
+| `npm run build` | Production build |
+| `npm run start` | Serve production build |
+| `npm run lint` | ESLint |
 
-## Database Schema
+## Database
 
-Managed by Drizzle ORM (`src/db/schema.ts`):
+Managed by Drizzle ORM. Schema in `src/db/schema.ts`.
 
-| Table | Description |
-| ----- | ----------- |
-| `accounts` | Financial accounts (current, savings, credit card, investment) with encrypted names |
-| `transactions` | Income/expense records with encrypted descriptions, recurring patterns, and category/account links |
-| `categories` | User spending categories with colour and icon |
-| `budgets` | Spending limits per category (monthly/weekly) |
-| `goals` | Savings goals with target amount, deadline, and contributions |
-| `budget_alert_preferences` | Per-budget alert thresholds (browser + email) |
-| `budget_notifications` | Dispatched alert history |
-| `categorisation_rules` | Pattern-based auto-categorisation for transactions |
-| `truelayer_connections` | OAuth tokens (encrypted) for open banking |
-| `trading212_connections` | Encrypted API keys for Trading 212 |
-| `manual_holdings` | User-entered investment positions with cached Yahoo Finance prices |
-| `default_category_templates` | Built-in category templates for onboarding |
-| `user_onboarding` | Per-user onboarding state and base currency |
+| Table | What it stores |
+| --- | --- |
+| `accounts` | Financial accounts with encrypted names |
+| `transactions` | Income/expense records, encrypted descriptions, recurring patterns |
+| `categories` | Spending categories (colour, icon) |
+| `categorisation_rules` | Pattern → category mappings for auto-categorisation |
+| `budgets` | Spending limits per category |
+| `budget_alert_preferences` | Per-budget alert thresholds |
+| `budget_notifications` | Alert dispatch history |
+| `goals` | Savings goals with contributions |
+| `debts` | Debt tracking with interest rates |
+| `debt_payments` | Debt payment history |
+| `subscriptions` | Recurring subscriptions |
+| `net_worth_snapshots` | Historical net worth data points |
+| `truelayer_connections` | Encrypted OAuth tokens, last sync timestamp |
+| `trading212_connections` | Encrypted API key + secret |
+| `manual_holdings` | Investment positions with cached prices |
+| `investment_groups` | Portfolio grouping |
+| `shared_access` | Account sharing between users |
+| `user_onboarding` | Onboarding state and base currency |
+| `default_category_templates` | Built-in category templates |
 
 ## License
 
