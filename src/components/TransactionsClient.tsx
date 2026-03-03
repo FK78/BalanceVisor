@@ -45,7 +45,14 @@ import {
   SortingState,
   useReactTable,
 } from "@tanstack/react-table";
-import { ArrowDownLeft, ArrowRightLeft, ArrowUpDown, ArrowUpRight, ChevronDown, ChevronRight, Download, Receipt, RefreshCw, Search, Split, Trash2, X } from "lucide-react";
+import { ArrowDownLeft, ArrowRightLeft, ArrowUpDown, ArrowUpRight, ChevronDown, ChevronRight, Download, Receipt, RefreshCw, Search, Split, Trash2, X, Wallet } from "lucide-react";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { SplitTransactionDialog } from "@/components/SplitTransactionDialog";
 import { deleteTransaction } from "@/db/mutations/transactions";
 import { formatCurrency } from "@/lib/formatCurrency";
@@ -144,12 +151,13 @@ function formatDate(date: string | null) {
   }).format(new Date(date));
 }
 
-function getPageHref(page: number, startDate?: string, endDate?: string, search?: string) {
+function getPageHref(page: number, startDate?: string, endDate?: string, search?: string, accountId?: string) {
   const params = new URLSearchParams();
   if (page > 1) params.set("page", String(page));
   if (startDate) params.set("startDate", startDate);
   if (endDate) params.set("endDate", endDate);
   if (search) params.set("search", search);
+  if (accountId) params.set("account", accountId);
   const qs = params.toString();
   return `/dashboard/transactions${qs ? `?${qs}` : ""}`;
 }
@@ -179,6 +187,7 @@ export function TransactionsClient({
   startDate: activeStartDate,
   endDate: activeEndDate,
   search: activeSearch,
+  accountId: activeAccountId,
   dailyTrend,
   dailyCategoryExpenses,
   currency,
@@ -195,6 +204,7 @@ export function TransactionsClient({
   startDate?: string;
   endDate?: string;
   search?: string;
+  accountId?: string;
   dailyTrend: DailyCashflowPoint[];
   dailyCategoryExpenses: DailyCategoryExpensePoint[];
   currency: string;
@@ -207,11 +217,14 @@ export function TransactionsClient({
   const [searchInput, setSearchInput] = useState(activeSearch ?? "");
   const [filterStartDate, setFilterStartDate] = useState(activeStartDate ?? "");
   const [filterEndDate, setFilterEndDate] = useState(activeEndDate ?? "");
+  const [filterAccountId, setFilterAccountId] = useState(activeAccountId ?? "__all__");
   const [exportStartDate, setExportStartDate] = useState(() => formatDateInput(addDays(new Date(), -30)));
   const [exportEndDate, setExportEndDate] = useState(() => formatDateInput(new Date()));
-  const isFilterActive = !!activeStartDate || !!activeEndDate;
+  const isAccountFilterActive = !!activeAccountId;
+  const isDateFilterActive = !!activeStartDate || !!activeEndDate;
+  const isFilterActive = isDateFilterActive || isAccountFilterActive;
   const isSearchActive = !!activeSearch;
-  const dateLabel = isFilterActive
+  const dateLabel = isDateFilterActive
     ? `${activeStartDate ?? "start"} to ${activeEndDate ?? "now"}`
     : "All time";
   const canCreateTransaction = accounts.length > 0 && categories.length > 0;
@@ -492,7 +505,7 @@ export function TransactionsClient({
             onSubmit={(e) => {
               e.preventDefault();
               const trimmed = searchInput.trim();
-              router.push(getPageHref(1, activeStartDate, activeEndDate, trimmed || undefined));
+              router.push(getPageHref(1, activeStartDate, activeEndDate, trimmed || undefined, activeAccountId));
             }}
           >
             <div className="flex gap-2">
@@ -514,7 +527,7 @@ export function TransactionsClient({
                   variant="outline"
                   onClick={() => {
                     setSearchInput("");
-                    router.push(getPageHref(1, activeStartDate, activeEndDate));
+                    router.push(getPageHref(1, activeStartDate, activeEndDate, undefined, activeAccountId));
                   }}
                 >
                   <X className="mr-1 h-3.5 w-3.5" />
@@ -530,7 +543,7 @@ export function TransactionsClient({
             </p>
           )}
           <div className="flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
-            <div className="grid flex-1 grid-cols-1 gap-3 sm:grid-cols-2">
+            <div className="grid flex-1 grid-cols-1 gap-3 sm:grid-cols-3">
               <div className="space-y-1.5">
                 <Label htmlFor="filter-start-date">From</Label>
                 <Input
@@ -549,10 +562,32 @@ export function TransactionsClient({
                   onChange={(e) => setFilterEndDate(e.target.value)}
                 />
               </div>
+              <div className="space-y-1.5">
+                <Label>Account</Label>
+                <Select
+                  value={filterAccountId}
+                  onValueChange={setFilterAccountId}
+                >
+                  <SelectTrigger className="w-full">
+                    <SelectValue placeholder="All accounts" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="__all__">
+                      <Wallet className="mr-2 h-3.5 w-3.5 text-muted-foreground" />
+                      All accounts
+                    </SelectItem>
+                    {accounts.map((a) => (
+                      <SelectItem key={a.id} value={a.id}>
+                        {a.accountName}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
             </div>
             <div className="flex gap-2">
               <Button asChild>
-                <Link href={getPageHref(1, filterStartDate || undefined, filterEndDate || undefined, activeSearch)}>
+                <Link href={getPageHref(1, filterStartDate || undefined, filterEndDate || undefined, activeSearch, filterAccountId === "__all__" ? undefined : filterAccountId)}>
                   Apply Filter
                 </Link>
               </Button>
@@ -703,7 +738,7 @@ export function TransactionsClient({
                   </p>
                 </div>
                 <Button asChild size="sm" variant="outline">
-                  <Link href={getPageHref(1)}>Go to first page</Link>
+                  <Link href={getPageHref(1, undefined, undefined, undefined, activeAccountId)}>Go to first page</Link>
                 </Button>
               </div>
             )
@@ -796,7 +831,7 @@ export function TransactionsClient({
                 <div className="flex items-center gap-2">
                   {resolvedCurrentPage > 1 ? (
                     <Button asChild size="sm" variant="outline">
-                      <Link href={getPageHref(resolvedCurrentPage - 1, activeStartDate, activeEndDate, activeSearch)}>Previous</Link>
+                      <Link href={getPageHref(resolvedCurrentPage - 1, activeStartDate, activeEndDate, activeSearch, activeAccountId)}>Previous</Link>
                     </Button>
                   ) : (
                     <Button size="sm" variant="outline" disabled>
@@ -808,7 +843,7 @@ export function TransactionsClient({
                   </p>
                   {resolvedCurrentPage < totalPages ? (
                     <Button asChild size="sm" variant="outline">
-                      <Link href={getPageHref(resolvedCurrentPage + 1, activeStartDate, activeEndDate, activeSearch)}>Next</Link>
+                      <Link href={getPageHref(resolvedCurrentPage + 1, activeStartDate, activeEndDate, activeSearch, activeAccountId)}>Next</Link>
                     </Button>
                   ) : (
                     <Button size="sm" variant="outline" disabled>

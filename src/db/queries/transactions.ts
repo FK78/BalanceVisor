@@ -79,10 +79,11 @@ export async function getTransactionsForExport(
   return decryptTransactionRows(rows);
 }
 
-export async function getTransactionsCount(userId: string, startDate?: string, endDate?: string) {
+export async function getTransactionsCount(userId: string, startDate?: string, endDate?: string, accountId?: string) {
   const conditions = [eq(accountsTable.user_id, userId)];
   if (startDate) conditions.push(gte(transactionsTable.date, startDate));
   if (endDate) conditions.push(lte(transactionsTable.date, endDate));
+  if (accountId) conditions.push(eq(transactionsTable.account_id, accountId));
 
   const [row] = await db
     .select({ total: sql<number>`count(*)`.mapWith(Number) })
@@ -99,6 +100,7 @@ export async function getTransactionsWithDetailsPaginated(
   pageSize: number,
   startDate?: string,
   endDate?: string,
+  accountId?: string,
 ) {
   const safePage = Number.isFinite(page) && page > 0 ? Math.floor(page) : 1;
   const safePageSize = Number.isFinite(pageSize) && pageSize > 0
@@ -109,6 +111,7 @@ export async function getTransactionsWithDetailsPaginated(
   let query = baseTransactionsQuery(userId);
   if (startDate) query = query.where(gte(transactionsTable.date, startDate));
   if (endDate) query = query.where(lte(transactionsTable.date, endDate));
+  if (accountId) query = query.where(eq(transactionsTable.account_id, accountId));
 
   const rows = await query
     .orderBy(desc(transactionsTable.date), desc(transactionsTable.id))
@@ -122,6 +125,7 @@ export async function getTotalsByType(
   type: 'income' | 'expense',
   startDate?: string,
   endDate?: string,
+  accountId?: string,
 ) {
   const conditions = [
     eq(accountsTable.user_id, userId),
@@ -129,6 +133,7 @@ export async function getTotalsByType(
   ];
   if (startDate) conditions.push(gte(transactionsTable.date, startDate));
   if (endDate) conditions.push(lte(transactionsTable.date, endDate));
+  if (accountId) conditions.push(eq(transactionsTable.account_id, accountId));
 
   const [row] = await db
     .select({ total: sum(transactionsTable.amount) })
@@ -158,6 +163,7 @@ export async function searchTransactions(
   pageSize: number,
   startDate?: string,
   endDate?: string,
+  accountId?: string,
 ): Promise<SearchTransactionsResult> {
   const safePage = Number.isFinite(page) && page > 0 ? Math.floor(page) : 1;
   const safePageSize = Number.isFinite(pageSize) && pageSize > 0 ? Math.floor(pageSize) : 10;
@@ -165,6 +171,7 @@ export async function searchTransactions(
   let query = baseTransactionsQuery(userId);
   if (startDate) query = query.where(gte(transactionsTable.date, startDate));
   if (endDate) query = query.where(lte(transactionsTable.date, endDate));
+  if (accountId) query = query.where(eq(transactionsTable.account_id, accountId));
 
   const allRows = await query.orderBy(desc(transactionsTable.date), desc(transactionsTable.id));
   const decrypted = decryptTransactionRows(allRows);

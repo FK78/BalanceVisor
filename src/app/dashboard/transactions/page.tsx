@@ -34,13 +34,14 @@ function normalizeDate(value?: string): string | undefined {
 export default async function Transactions({
   searchParams,
 }: {
-  searchParams?: Promise<{ page?: string; startDate?: string; endDate?: string; search?: string }>;
+  searchParams?: Promise<{ page?: string; startDate?: string; endDate?: string; search?: string; account?: string }>;
 }) {
   const resolvedSearchParams = await searchParams;
   const requestedPage = normalizePage(resolvedSearchParams?.page);
   const startDate = normalizeDate(resolvedSearchParams?.startDate);
   const endDate = normalizeDate(resolvedSearchParams?.endDate);
   const search = resolvedSearchParams?.search?.trim() || undefined;
+  const accountId = resolvedSearchParams?.account || undefined;
   const userId = await getCurrentUserId();
 
   let transactions;
@@ -49,17 +50,17 @@ export default async function Transactions({
   let totalExpenses: number;
 
   if (search) {
-    const result = await searchTransactions(userId, search, requestedPage, PAGE_SIZE, startDate, endDate);
+    const result = await searchTransactions(userId, search, requestedPage, PAGE_SIZE, startDate, endDate, accountId);
     transactions = result.transactions;
     totalTransactions = result.totalCount;
     totalIncome = result.totalIncome;
     totalExpenses = result.totalExpenses;
   } else {
     [transactions, totalTransactions, totalIncome, totalExpenses] = await Promise.all([
-      getTransactionsWithDetailsPaginated(userId, requestedPage, PAGE_SIZE, startDate, endDate),
-      getTransactionsCount(userId, startDate, endDate),
-      getTotalsByType(userId, 'income', startDate, endDate),
-      getTotalsByType(userId, 'expense', startDate, endDate),
+      getTransactionsWithDetailsPaginated(userId, requestedPage, PAGE_SIZE, startDate, endDate, accountId),
+      getTransactionsCount(userId, startDate, endDate, accountId),
+      getTotalsByType(userId, 'income', startDate, endDate, accountId),
+      getTotalsByType(userId, 'expense', startDate, endDate, accountId),
     ]);
   }
 
@@ -79,6 +80,7 @@ export default async function Transactions({
     if (startDate) params.set("startDate", startDate);
     if (endDate) params.set("endDate", endDate);
     if (search) params.set("search", search);
+    if (accountId) params.set("account", accountId);
     const qs = params.toString();
     redirect(`/dashboard/transactions${qs ? `?${qs}` : ""}`);
   }
@@ -104,6 +106,7 @@ export default async function Transactions({
       startDate={startDate}
       endDate={endDate}
       search={search}
+      accountId={accountId}
       dailyTrend={dailyTrend}
       dailyCategoryExpenses={dailyCategoryExpenses}
       currency={baseCurrency}

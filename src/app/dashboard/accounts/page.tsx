@@ -199,9 +199,21 @@ export default async function Accounts() {
                       {(() => { const Icon = typeIcons[account.type ?? ""] ?? Wallet; return <Icon className="text-primary h-5 w-5" />; })()}
                     </div>
                     <div>
-                      <CardTitle className="text-base">{account.accountName}</CardTitle>
+                      <CardTitle className="text-base">
+                        <Link
+                          href={`/dashboard/transactions?account=${account.id}`}
+                          className="hover:underline"
+                        >
+                          {account.accountName}
+                        </Link>
+                      </CardTitle>
                       <CardDescription className="text-xs">
-                        {account.transactions} transactions
+                        <Link
+                          href={`/dashboard/transactions?account=${account.id}`}
+                          className="hover:underline"
+                        >
+                          {account.transactions} transactions
+                        </Link>
                       </CardDescription>
                     </div>
                   </div>
@@ -231,13 +243,14 @@ export default async function Accounts() {
                   </div>
                 </CardHeader>
                 <CardContent>
-                  <p
-                    className={`text-2xl font-bold tabular-nums ${account.balance >= 0 ? "text-foreground" : "text-red-600"
+                  <Link
+                    href={`/dashboard/transactions?account=${account.id}`}
+                    className={`text-2xl font-bold tabular-nums hover:underline ${account.balance >= 0 ? "text-foreground" : "text-red-600"
                       }`}
                   >
                     {account.balance < 0 ? "−" : ""}
                     {formatCurrency(account.balance, baseCurrency)}
-                  </p>
+                  </Link>
                   {/* Linked investments for investment accounts */}
                   {account.type === "investment" && investmentCountByAccount.has(account.id) && (() => {
                     const info = investmentCountByAccount.get(account.id)!;
