@@ -2,6 +2,7 @@ import { getTrading212Connection, getManualHoldings } from "@/db/queries/investm
 import { getT212AccountSummary } from "@/lib/trading212";
 import { getQuotes } from "@/lib/yahoo-finance";
 import { decrypt } from "@/lib/encryption";
+import { logger } from "@/lib/logger";
 
 export async function getInvestmentValue(userId: string): Promise<number> {
   const [t212Connection, manualHoldings] = await Promise.all([
@@ -17,7 +18,9 @@ export async function getInvestmentValue(userId: string): Promise<number> {
       const apiSecret = decrypt(t212Connection.api_secret_encrypted);
       const summary = await getT212AccountSummary(apiKey, apiSecret, t212Connection.environment);
       value += summary.totalValue;
-    } catch { /* T212 fetch failed — skip */ }
+    } catch (err) {
+      logger.error("investment-value", "T212 fetch failed", err);
+    }
   }
 
   if (manualHoldings.length > 0) {

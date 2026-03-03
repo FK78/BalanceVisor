@@ -1,5 +1,6 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import YahooFinanceClass from "yahoo-finance2";
+import { logger } from "@/lib/logger";
 
 const yahooFinance: any = new (YahooFinanceClass as any)();
 
@@ -39,6 +40,7 @@ export async function getQuote(ticker: string): Promise<YahooQuote | null> {
       currency,
     };
   } catch {
+    logger.warn("yahoo-finance", "Quote fetch failed", { ticker });
     return null;
   }
 }
@@ -68,6 +70,7 @@ export async function searchTicker(query: string) {
         exchange: q.exchDisp as string | undefined,
       }));
   } catch {
+    logger.warn("yahoo-finance", "Ticker search failed", { query });
     return [];
   }
 }

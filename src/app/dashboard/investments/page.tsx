@@ -99,8 +99,8 @@ export default async function InvestmentsPage() {
       ]);
       t212Positions = positions;
       t212Cash = summary.cash.availableToTrade;
-    } catch (e) {
-      t212Error = e instanceof Error ? e.message : "Failed to fetch Trading 212 data";
+    } catch {
+      t212Error = "Unable to sync your Trading 212 data right now. Try again later or reconnect your account.";
     }
   }
 

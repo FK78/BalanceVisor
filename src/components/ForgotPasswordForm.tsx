@@ -2,6 +2,7 @@
 
 import { cn } from "@/lib/utils";
 import { createClient } from "@/lib/supabase/client";
+import { userError } from "@/lib/user-error";
 import { Button } from "@/components/ui/button";
 import {
   Card,
@@ -37,8 +38,8 @@ export function ForgotPasswordForm({
       });
       if (error) throw error;
       setSuccess(true);
-    } catch (error: unknown) {
-      setError(error instanceof Error ? error.message : "An error occurred");
+    } catch (err: unknown) {
+      setError(userError("forgot-password", err, "Unable to send reset link. Please try again."));
     } finally {
       setIsLoading(false);
     }

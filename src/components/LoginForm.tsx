@@ -2,6 +2,7 @@
 
 import { cn } from "@/lib/utils";
 import { createClient } from "@/lib/supabase/client";
+import { userError } from "@/lib/user-error";
 import { Button } from "@/components/ui/button";
 import {
   Card,
@@ -40,8 +41,8 @@ export function LoginForm({
       });
       if (error) throw error;
       router.push("/dashboard");
-    } catch (error: unknown) {
-      setError(error instanceof Error ? error.message : "An error occurred");
+    } catch (err: unknown) {
+      setError(userError("login", err, "Unable to sign in. Please try again."));
     } finally {
       setIsLoading(false);
     }

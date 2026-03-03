@@ -73,10 +73,8 @@ export function TransferFormDialog({
         const result = await addTransfer(formData);
         onSaved?.(result.id);
         setView("success");
-      } catch (err) {
-        setError(
-          err instanceof Error ? err.message : "Failed to create transfer."
-        );
+      } catch {
+        setError("Something went wrong creating the transfer. Please try again.");
       }
     });
   }

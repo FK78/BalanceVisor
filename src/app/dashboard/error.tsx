@@ -20,7 +20,7 @@ export default function DashboardError({
   reset: () => void;
 }) {
   useEffect(() => {
-    console.error(error);
+    console.error("[dashboard]", error);
   }, [error]);
 
   return (
@@ -32,14 +32,21 @@ export default function DashboardError({
           </div>
           <CardTitle>Couldn&apos;t load dashboard data</CardTitle>
           <CardDescription>
-            Something went wrong while fetching your data. Try again.
+            Something went wrong while fetching your data. Please try again or contact support if the issue persists.
           </CardDescription>
         </CardHeader>
-        <CardContent className="flex justify-center gap-2">
-          <Button onClick={() => reset()}>Try again</Button>
-          <Button asChild variant="outline">
-            <Link href="/dashboard">Back to dashboard</Link>
-          </Button>
+        <CardContent className="space-y-3">
+          <div className="flex justify-center gap-2">
+            <Button onClick={() => reset()}>Try again</Button>
+            <Button asChild variant="outline">
+              <Link href="/dashboard">Back to dashboard</Link>
+            </Button>
+          </div>
+          {error.digest && (
+            <p className="text-center text-xs text-muted-foreground">
+              Ref: {error.digest}
+            </p>
+          )}
         </CardContent>
       </Card>
     </div>

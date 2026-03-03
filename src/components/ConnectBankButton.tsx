@@ -39,8 +39,8 @@ export function ConnectBankButton({ connections }: { connections: Connection[] }
       try {
         const res = await importFromTrueLayer();
         setResult(res);
-      } catch (err) {
-        setError(err instanceof Error ? err.message : 'Import failed');
+      } catch {
+        setError('Bank sync failed. Please try again or reconnect your bank.');
       }
     });
   }

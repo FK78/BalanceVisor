@@ -20,6 +20,7 @@ import {
 } from "@/lib/truelayer";
 import { getUserBaseCurrency } from "@/db/queries/onboarding";
 import { matchCategorisationRule } from "@/lib/auto-categorise";
+import { logger } from "@/lib/logger";
 
 // ---------------------------------------------------------------------------
 // Save a new TrueLayer connection after OAuth callback
@@ -140,7 +141,7 @@ export async function importFromTrueLayer() {
         );
         balance = balanceData.current;
       } catch {
-        // Balance endpoint might not be available for all accounts
+        logger.warn("truelayer.import", "Balance fetch failed for account", { accountId: tlAccount.account_id });
       }
 
       let localAccountId: string;
@@ -199,7 +200,7 @@ export async function importFromTrueLayer() {
           to
         );
       } catch {
-        // Transaction endpoint might fail for some accounts
+        logger.warn("truelayer.import", "Transaction fetch failed for account", { accountId: tlAccount.account_id });
         continue;
       }
 
@@ -299,8 +300,8 @@ export async function syncBankIfNeeded(): Promise<{ synced: boolean; accountsImp
   try {
     const result = await importFromTrueLayer();
     return { synced: true, ...result };
-  } catch {
-    // Auto-sync failed — non-critical, don't break the page
+  } catch (err) {
+    logger.error("truelayer.sync", "Auto-sync failed", err);
     return { synced: false, accountsImported: 0, transactionsImported: 0 };
   }
 }

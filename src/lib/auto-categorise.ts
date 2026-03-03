@@ -5,6 +5,7 @@ import { groq } from '@ai-sdk/groq';
 import { generateText } from 'ai';
 import { z } from 'zod';
 import { getCategoriesByUser } from '@/db/queries/categories';
+import { logger } from '@/lib/logger';
 
 const categoriseSchema = z.object({
   category_id: z.string().nullable(),
@@ -91,8 +92,8 @@ Respond with ONLY the JSON object, no other text.`,
     }
 
     return null;
-  } catch {
-    // AI categorisation failed — degrade gracefully
+  } catch (err) {
+    logger.error("auto-categorise", "AI categorisation failed", err);
     return null;
   }
 }

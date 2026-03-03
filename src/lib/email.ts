@@ -1,4 +1,5 @@
 import { Resend } from 'resend';
+import { logger } from '@/lib/logger';
 
 const resend = process.env.RESEND_API_KEY
   ? new Resend(process.env.RESEND_API_KEY)
@@ -51,6 +52,6 @@ export async function sendBudgetAlertEmail(
       html,
     });
   } catch (error) {
-    console.error('Failed to send budget alert email:', error);
+    logger.error("email", "Failed to send budget alert email", error);
   }
 }

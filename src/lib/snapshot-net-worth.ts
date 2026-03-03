@@ -2,6 +2,7 @@ import { db } from '@/index';
 import { netWorthSnapshotsTable, accountsTable } from '@/db/schema';
 import { eq, and } from 'drizzle-orm';
 import { getInvestmentValue } from '@/lib/investment-value';
+import { logger } from '@/lib/logger';
 
 /**
  * Record today's net worth snapshot if one doesn't already exist.
@@ -41,7 +42,9 @@ export async function snapshotNetWorthIfNeeded(userId: string): Promise<void> {
   let investmentValue = 0;
   try {
     investmentValue = await getInvestmentValue(userId);
-  } catch { /* investment fetch failed — use 0 */ }
+  } catch (err) {
+    logger.error("snapshot-net-worth", "Investment fetch failed, using 0", err);
+  }
 
   const netWorth = totalAssets - totalLiabilities + investmentValue;
 

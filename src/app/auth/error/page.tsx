@@ -12,9 +12,12 @@ async function ErrorContent({
 
   return (
     <p className="text-center text-sm text-muted-foreground">
-      {params?.error
-        ? `Error: ${params.error}`
-        : "An unspecified error occurred. Please try again."}
+      An authentication error occurred. Please try again or contact support if this keeps happening.
+      {params?.error && (
+        <span className="block mt-1 text-xs text-muted-foreground/60">
+          Ref: {params.error.slice(0, 32).replace(/[^a-zA-Z0-9_-]/g, "")}
+        </span>
+      )}
     </p>
   );
 }

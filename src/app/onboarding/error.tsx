@@ -32,14 +32,21 @@ export default function OnboardingError({
           </div>
           <CardTitle>Couldn&apos;t load onboarding</CardTitle>
           <CardDescription>
-            We hit an error while loading your setup progress.
+            Something went wrong while loading your setup. Please try again or contact support if the issue persists.
           </CardDescription>
         </CardHeader>
-        <CardContent className="flex justify-center gap-2">
-          <Button onClick={() => reset()}>Try again</Button>
-          <Button asChild variant="outline">
-            <Link href="/onboarding">Reload onboarding</Link>
-          </Button>
+        <CardContent className="space-y-3">
+          <div className="flex justify-center gap-2">
+            <Button onClick={() => reset()}>Try again</Button>
+            <Button asChild variant="outline">
+              <Link href="/onboarding">Reload onboarding</Link>
+            </Button>
+          </div>
+          {error.digest && (
+            <p className="text-center text-xs text-muted-foreground">
+              Ref: {error.digest}
+            </p>
+          )}
         </CardContent>
       </Card>
     </div>
