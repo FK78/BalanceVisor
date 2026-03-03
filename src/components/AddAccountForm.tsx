@@ -22,6 +22,7 @@ import {
   DialogTrigger,
 } from "@/components/ui/dialog";
 import { addAccount, editAccount } from "@/db/mutations/accounts";
+import { toast } from "sonner";
 
 type Account = {
   id: string;
@@ -48,12 +49,18 @@ export function AccountFormDialog({ account }: { account?: Account } = {}) {
     e.preventDefault();
     const formData = new FormData(e.currentTarget);
     startTransition(async () => {
-      if (isEdit) {
-        await editAccount(account.id, formData);
-      } else {
-        await addAccount(formData);
+      try {
+        if (isEdit) {
+          await editAccount(account.id, formData);
+          toast.success("Account updated");
+        } else {
+          await addAccount(formData);
+          toast.success("Account added");
+        }
+        setView("success");
+      } catch {
+        toast.error("Something went wrong. Please try again.");
       }
-      setView("success");
     });
   }
 

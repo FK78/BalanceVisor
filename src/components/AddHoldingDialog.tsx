@@ -23,6 +23,7 @@ import {
 } from "@/components/ui/select";
 import { addManualHolding, editManualHolding } from "@/db/mutations/investments";
 import { searchTickers } from "@/db/queries/investments";
+import { toast } from "sonner";
 
 type InvestmentAccount = { id: string; accountName: string };
 type InvestmentGroupOption = { id: string; name: string; color: string; account_id: string | null };
@@ -117,12 +118,18 @@ export function AddHoldingDialog({
     formData.set("ticker", selectedTicker);
     formData.set("name", selectedName);
     startTransition(async () => {
-      if (isEdit) {
-        await editManualHolding(holding.id, formData);
-      } else {
-        await addManualHolding(formData);
+      try {
+        if (isEdit) {
+          await editManualHolding(holding.id, formData);
+          toast.success("Holding updated");
+        } else {
+          await addManualHolding(formData);
+          toast.success("Holding added");
+        }
+        setView("success");
+      } catch {
+        toast.error("Something went wrong. Please try again.");
       }
-      setView("success");
     });
   }
 

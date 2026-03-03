@@ -23,6 +23,7 @@ import {
 } from "@/components/ui/dialog";
 import { addSplitTransaction } from "@/db/mutations/transactions";
 import type { Account, Category } from "@/lib/types";
+import { toast } from "sonner";
 
 type SplitRow = {
   key: number;
@@ -107,15 +108,20 @@ export function SplitTransactionDialog({
     if (validSplits.length < 2) return;
 
     startTransition(async () => {
-      await addSplitTransaction(
-        type,
-        totalAmount,
-        description,
-        accountId,
-        txnDate,
-        validSplits,
-      );
-      setView("success");
+      try {
+        await addSplitTransaction(
+          type,
+          totalAmount,
+          description,
+          accountId,
+          txnDate,
+          validSplits,
+        );
+        toast.success("Split transaction added");
+        setView("success");
+      } catch {
+        toast.error("Something went wrong. Please try again.");
+      }
     });
   }
 

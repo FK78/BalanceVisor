@@ -23,6 +23,7 @@ import {
 } from "@/components/ui/dialog";
 import { Badge } from "@/components/ui/badge";
 import { shareResource, revokeShare } from "@/db/mutations/sharing";
+import { toast } from "sonner";
 
 type Share = {
   id: string;
@@ -58,8 +59,13 @@ export function ShareDialog({
     formData.set("resource_type", resourceType);
     formData.set("resource_id", resourceId);
     startTransition(async () => {
-      await shareResource(formData);
-      setView("success");
+      try {
+        await shareResource(formData);
+        toast.success("Invitation sent");
+        setView("success");
+      } catch {
+        toast.error("Failed to send invitation");
+      }
     });
   }
 
@@ -70,7 +76,12 @@ export function ShareDialog({
 
   function handleRevoke(shareId: string) {
     startTransition(async () => {
-      await revokeShare(shareId);
+      try {
+        await revokeShare(shareId);
+        toast.success("Access revoked");
+      } catch {
+        toast.error("Failed to revoke access");
+      }
     });
   }
 

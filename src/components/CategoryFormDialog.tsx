@@ -16,6 +16,7 @@ import {
   DialogTrigger,
 } from "@/components/ui/dialog";
 import { addCategory, editCategory } from "@/db/mutations/categories";
+import { toast } from "sonner";
 
 type Category = {
   id: string;
@@ -64,12 +65,18 @@ export function CategoryFormDialog({ category }: { category?: Category }) {
     formData.set("color", selectedColor);
     formData.set("icon", selectedIcon ?? "");
     startTransition(async () => {
-      if (isEdit) {
-        await editCategory(category.id, formData);
-      } else {
-        await addCategory(formData);
+      try {
+        if (isEdit) {
+          await editCategory(category.id, formData);
+          toast.success("Category updated");
+        } else {
+          await addCategory(formData);
+          toast.success("Category added");
+        }
+        setView("success");
+      } catch {
+        toast.error("Something went wrong. Please try again.");
       }
-      setView("success");
     });
   }
 

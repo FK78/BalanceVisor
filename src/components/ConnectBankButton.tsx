@@ -14,6 +14,7 @@ import {
 } from '@/components/ui/dialog';
 import { importFromTrueLayer, disconnectTrueLayer } from '@/db/mutations/truelayer';
 import { formatTimeAgo } from '@/lib/formatTimeAgo';
+import { toast } from 'sonner';
 
 type Connection = {
   id: string;
@@ -41,8 +42,12 @@ export function ConnectBankButton({ connections }: { connections: Connection[] }
       try {
         const res = await importFromTrueLayer();
         setResult(res);
+        toast.success(
+          `Imported ${res.accountsImported} account${res.accountsImported !== 1 ? 's' : ''}, ${res.transactionsImported} transaction${res.transactionsImported !== 1 ? 's' : ''}`,
+        );
       } catch {
         setError('Bank sync failed. Please try again or reconnect your bank.');
+        toast.error('Bank sync failed');
       }
     });
   }
@@ -50,6 +55,7 @@ export function ConnectBankButton({ connections }: { connections: Connection[] }
   function handleDisconnect(connectionId: string) {
     startDisconnect(async () => {
       await disconnectTrueLayer(connectionId);
+      toast.success('Bank disconnected');
     });
   }
 

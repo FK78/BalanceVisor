@@ -29,7 +29,6 @@ import {
   DialogTrigger,
 } from "@/components/ui/dialog";
 import {
-  CheckCircle2,
   Download,
   Loader2,
   Moon,
@@ -37,6 +36,7 @@ import {
   Trash2,
   User,
 } from "lucide-react";
+import { toast } from "sonner";
 import { useTheme } from "@/components/ThemeProvider";
 import {
   updateDisplayName,
@@ -71,12 +71,10 @@ export function SettingsClient({
 
   // Profile
   const [profilePending, startProfileTransition] = useTransition();
-  const [profileMessage, setProfileMessage] = useState<string | null>(null);
 
   // Currency
   const [currencyValue, setCurrencyValue] = useState(baseCurrency);
   const [currencyPending, startCurrencyTransition] = useTransition();
-  const [currencyMessage, setCurrencyMessage] = useState<string | null>(null);
 
   // Export
   const [exportPending, startExportTransition] = useTransition();
@@ -92,10 +90,9 @@ export function SettingsClient({
     startProfileTransition(async () => {
       const result = await updateDisplayName(formData);
       if (result.error) {
-        setProfileMessage(result.error);
+        toast.error(result.error);
       } else {
-        setProfileMessage("Display name updated!");
-        setTimeout(() => setProfileMessage(null), 3000);
+        toast.success("Display name updated");
       }
     });
   }
@@ -107,26 +104,30 @@ export function SettingsClient({
     startCurrencyTransition(async () => {
       const result = await updateBaseCurrency(formData);
       if (result.error) {
-        setCurrencyMessage(result.error);
+        toast.error(result.error);
       } else {
-        setCurrencyMessage("Base currency updated!");
-        setTimeout(() => setCurrencyMessage(null), 3000);
+        toast.success("Base currency updated");
       }
     });
   }
 
   function handleExport() {
     startExportTransition(async () => {
-      const data = await exportUserData();
-      const blob = new Blob([JSON.stringify(data, null, 2)], {
-        type: "application/json",
-      });
-      const url = URL.createObjectURL(blob);
-      const a = document.createElement("a");
-      a.href = url;
-      a.download = `balancevisor-export-${new Date().toISOString().split("T")[0]}.json`;
-      a.click();
-      URL.revokeObjectURL(url);
+      try {
+        const data = await exportUserData();
+        const blob = new Blob([JSON.stringify(data, null, 2)], {
+          type: "application/json",
+        });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement("a");
+        a.href = url;
+        a.download = `balancevisor-export-${new Date().toISOString().split("T")[0]}.json`;
+        a.click();
+        URL.revokeObjectURL(url);
+        toast.success("Data exported");
+      } catch {
+        toast.error("Failed to export data");
+      }
     });
   }
 
@@ -134,7 +135,7 @@ export function SettingsClient({
     startDeleteTransition(async () => {
       const result = await deleteAccount();
       if (result.error) {
-        alert(result.error);
+        toast.error(result.error);
       } else {
         router.push("/auth/login");
       }
@@ -181,18 +182,10 @@ export function SettingsClient({
                 Email cannot be changed here.
               </p>
             </div>
-            <div className="flex items-center gap-3">
-              <Button type="submit" disabled={profilePending}>
-                {profilePending && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-                Save Name
-              </Button>
-              {profileMessage && (
-                <span className="flex items-center gap-1 text-sm text-emerald-600">
-                  <CheckCircle2 className="h-3.5 w-3.5" />
-                  {profileMessage}
-                </span>
-              )}
-            </div>
+            <Button type="submit" disabled={profilePending}>
+              {profilePending && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+              Save Name
+            </Button>
           </form>
         </CardContent>
       </Card>
@@ -224,18 +217,10 @@ export function SettingsClient({
                 Changing this will update all your account currencies.
               </p>
             </div>
-            <div className="flex items-center gap-3">
-              <Button type="submit" variant="outline" disabled={currencyPending}>
-                {currencyPending && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-                Update Currency
-              </Button>
-              {currencyMessage && (
-                <span className="flex items-center gap-1 text-sm text-emerald-600">
-                  <CheckCircle2 className="h-3.5 w-3.5" />
-                  {currencyMessage}
-                </span>
-              )}
-            </div>
+            <Button type="submit" variant="outline" disabled={currencyPending}>
+              {currencyPending && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+              Update Currency
+            </Button>
           </form>
 
           {/* Theme */}

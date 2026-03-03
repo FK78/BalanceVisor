@@ -15,6 +15,7 @@ import {
   DialogTrigger,
 } from "@/components/ui/dialog";
 import { addGoal, editGoal } from "@/db/mutations/goals";
+import { toast } from "sonner";
 
 type Goal = {
   id: string;
@@ -44,12 +45,18 @@ export function GoalFormDialog({ goal }: { goal?: Goal }) {
     e.preventDefault();
     const formData = new FormData(e.currentTarget);
     startTransition(async () => {
-      if (isEdit) {
-        await editGoal(goal.id, formData);
-      } else {
-        await addGoal(formData);
+      try {
+        if (isEdit) {
+          await editGoal(goal.id, formData);
+          toast.success("Goal updated");
+        } else {
+          await addGoal(formData);
+          toast.success("Goal created");
+        }
+        setView("success");
+      } catch {
+        toast.error("Something went wrong. Please try again.");
       }
-      setView("success");
     });
   }
 

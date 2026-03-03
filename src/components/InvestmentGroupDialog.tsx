@@ -25,6 +25,7 @@ import {
   addInvestmentGroup,
   editInvestmentGroup,
 } from "@/db/mutations/investment-groups";
+import { toast } from "sonner";
 
 type InvestmentAccount = { id: string; accountName: string };
 
@@ -71,12 +72,18 @@ export function InvestmentGroupDialog({
     const formData = new FormData(e.currentTarget);
     if (isEdit) formData.set("id", group.id);
     startTransition(async () => {
-      if (isEdit) {
-        await editInvestmentGroup(formData);
-      } else {
-        await addInvestmentGroup(formData);
+      try {
+        if (isEdit) {
+          await editInvestmentGroup(formData);
+          toast.success("Group updated");
+        } else {
+          await addInvestmentGroup(formData);
+          toast.success("Group created");
+        }
+        setView("success");
+      } catch {
+        toast.error("Something went wrong. Please try again.");
       }
-      setView("success");
     });
   }
 

@@ -22,6 +22,7 @@ import {
   DialogTrigger,
 } from "@/components/ui/dialog";
 import { connectTrading212, disconnectTrading212 } from "@/db/mutations/investments";
+import { toast } from "sonner";
 
 type InvestmentAccount = { id: string; accountName: string };
 
@@ -47,14 +48,20 @@ export function ConnectTrading212Dialog({
     e.preventDefault();
     const formData = new FormData(e.currentTarget);
     startTransition(async () => {
-      await connectTrading212(formData);
-      setView("success");
+      try {
+        await connectTrading212(formData);
+        toast.success("Trading 212 connected");
+        setView("success");
+      } catch {
+        toast.error("Failed to connect Trading 212");
+      }
     });
   }
 
   function handleDisconnect() {
     startTransition(async () => {
       await disconnectTrading212();
+      toast.success("Trading 212 disconnected");
       setOpen(false);
     });
   }

@@ -4,6 +4,7 @@ import { useTransition } from "react";
 import { Pause, Play, Loader2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { toggleSubscription } from "@/db/mutations/subscriptions";
+import { toast } from "sonner";
 
 export function ToggleSubscriptionButton({ id, isActive }: { id: string; isActive: boolean }) {
   const [isPending, startTransition] = useTransition();
@@ -11,6 +12,7 @@ export function ToggleSubscriptionButton({ id, isActive }: { id: string; isActiv
   function handleToggle() {
     startTransition(async () => {
       await toggleSubscription(id);
+      toast.success(isActive ? "Subscription paused" : "Subscription resumed");
     });
   }
 

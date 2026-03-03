@@ -22,6 +22,7 @@ import {
   DialogTrigger,
 } from "@/components/ui/dialog";
 import { addBudget, editBudget } from "@/db/mutations/budgets";
+import { toast } from "sonner";
 
 type Category = {
   id: string;
@@ -60,12 +61,18 @@ export function BudgetFormDialog({ categories, budget }: { categories: Category[
     e.preventDefault();
     const formData = new FormData(e.currentTarget);
     startTransition(async () => {
-      if (isEdit) {
-        await editBudget(budget.id, formData);
-      } else {
-        await addBudget(formData);
+      try {
+        if (isEdit) {
+          await editBudget(budget.id, formData);
+          toast.success("Budget updated");
+        } else {
+          await addBudget(formData);
+          toast.success("Budget added");
+        }
+        setView("success");
+      } catch {
+        toast.error("Something went wrong. Please try again.");
       }
-      setView("success");
     });
   }
 

@@ -23,6 +23,7 @@ import {
 } from "@/components/ui/dialog";
 import { addTransfer } from "@/db/mutations/transactions";
 import type { Account } from "@/lib/types";
+import { toast } from "sonner";
 
 export function TransferFormDialog({
   accounts,
@@ -72,9 +73,11 @@ export function TransferFormDialog({
       try {
         const result = await addTransfer(formData);
         onSaved?.(result.id);
+        toast.success("Transfer recorded");
         setView("success");
       } catch {
         setError("Something went wrong creating the transfer. Please try again.");
+        toast.error("Transfer failed");
       }
     });
   }

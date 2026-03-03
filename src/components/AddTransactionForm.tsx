@@ -24,6 +24,7 @@ import {
 import { addTransaction, editTransaction } from "@/db/mutations/transactions";
 import { learnCategorisationRule } from "@/db/mutations/categorisation-rules";
 import type { Account, Category } from "@/lib/types";
+import { toast } from "sonner";
 
 type Transaction = {
   id: string;
@@ -87,20 +88,25 @@ export function TransactionFormDialog({
     const description = formData.get("description") as string;
 
     startTransition(async () => {
-      const result = isEdit
-        ? await editTransaction(formData)
-        : await addTransaction(formData);
-      setSavedIds((prev) => [...prev, result.id]);
+      try {
+        const result = isEdit
+          ? await editTransaction(formData)
+          : await addTransaction(formData);
+        setSavedIds((prev) => [...prev, result.id]);
+        toast.success(isEdit ? "Transaction updated" : "Transaction added");
 
-      // Check if category changed during edit — offer to create a rule
-      if (isEdit && newCategoryId && newCategoryId !== transaction.category_id && description) {
-        const cat = categories.find((c) => c.id === newCategoryId);
-        if (cat) {
-          setRuleSuggestion({ description, categoryId: newCategoryId, categoryName: cat.name });
+        // Check if category changed during edit — offer to create a rule
+        if (isEdit && newCategoryId && newCategoryId !== transaction.category_id && description) {
+          const cat = categories.find((c) => c.id === newCategoryId);
+          if (cat) {
+            setRuleSuggestion({ description, categoryId: newCategoryId, categoryName: cat.name });
+          }
         }
-      }
 
-      setView("success");
+        setView("success");
+      } catch {
+        toast.error("Something went wrong. Please try again.");
+      }
     });
   }
 

@@ -25,6 +25,7 @@ import {
   AlertCircle,
 } from "lucide-react";
 import { addTransaction } from "@/db/mutations/transactions";
+import { toast } from "sonner";
 
 type ParsedTransaction = {
   type: "income" | "expense";
@@ -117,9 +118,11 @@ export function QuickAddTransaction({
       try {
         const result = await addTransaction(formData);
         setSavedIds((prev) => [...prev, result.id]);
+        toast.success("Transaction added");
         setView("success");
       } catch {
         setParseError("Failed to save the transaction. Please try again.");
+        toast.error("Failed to save transaction");
         setView("input");
       }
     });

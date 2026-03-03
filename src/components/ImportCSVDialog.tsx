@@ -30,6 +30,7 @@ import {
 } from "@/components/ui/table";
 import { importTransactionsFromCSV } from "@/db/mutations/import-csv";
 import type { Account } from "@/lib/types";
+import { toast } from "sonner";
 
 type ImportResult = {
   imported: number;
@@ -221,6 +222,12 @@ export function ImportCSVDialog({
         );
         setResult(res);
         setStep("result");
+        if (res.imported > 0) {
+          toast.success(`Imported ${res.imported} transaction${res.imported !== 1 ? "s" : ""}`);
+        }
+        if (res.errors.length > 0) {
+          toast.error(`${res.errors.length} error${res.errors.length !== 1 ? "s" : ""} during import`);
+        }
       } catch (err) {
         setResult({
           imported: 0,
@@ -228,6 +235,7 @@ export function ImportCSVDialog({
           errors: [err instanceof Error ? err.message : "An unexpected error occurred."],
         });
         setStep("result");
+        toast.error("Import failed");
       }
     });
   }

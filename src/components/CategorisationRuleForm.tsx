@@ -26,6 +26,7 @@ import {
   editCategorisationRule,
 } from "@/db/mutations/categorisation-rules";
 import type { CategoryWithColor as Category } from "@/lib/types";
+import { toast } from "sonner";
 
 type Rule = {
   id: string;
@@ -56,12 +57,18 @@ export function CategorisationRuleFormDialog({
     e.preventDefault();
     const formData = new FormData(e.currentTarget);
     startTransition(async () => {
-      if (isEdit) {
-        await editCategorisationRule(rule.id, formData);
-      } else {
-        await addCategorisationRule(formData);
+      try {
+        if (isEdit) {
+          await editCategorisationRule(rule.id, formData);
+          toast.success("Rule updated");
+        } else {
+          await addCategorisationRule(formData);
+          toast.success("Rule created");
+        }
+        setView("success");
+      } catch {
+        toast.error("Something went wrong. Please try again.");
       }
-      setView("success");
     });
   }
 

@@ -15,6 +15,7 @@ import {
   DialogTrigger,
 } from "@/components/ui/dialog";
 import { addDebt, editDebt } from "@/db/mutations/debts";
+import { toast } from "sonner";
 
 type Debt = {
   id: string;
@@ -44,12 +45,18 @@ export function DebtFormDialog({ debt }: { debt?: Debt }) {
     e.preventDefault();
     const formData = new FormData(e.currentTarget);
     startTransition(async () => {
-      if (isEdit) {
-        await editDebt(debt.id, formData);
-      } else {
-        await addDebt(formData);
+      try {
+        if (isEdit) {
+          await editDebt(debt.id, formData);
+          toast.success("Debt updated");
+        } else {
+          await addDebt(formData);
+          toast.success("Debt added");
+        }
+        setView("success");
+      } catch {
+        toast.error("Something went wrong. Please try again.");
       }
-      setView("success");
     });
   }
 

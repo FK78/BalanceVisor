@@ -23,6 +23,7 @@ import {
 } from "@/components/ui/dialog";
 import { recordDebtPayment } from "@/db/mutations/debts";
 import type { Account } from "@/lib/types";
+import { toast } from "sonner";
 
 export function DebtPaymentDialog({
   debtId,
@@ -57,8 +58,13 @@ export function DebtPaymentDialog({
     const note = (formData.get("note") as string) || undefined;
 
     startTransition(async () => {
-      await recordDebtPayment(debtId, amount, date, accountId, note);
-      setView("success");
+      try {
+        await recordDebtPayment(debtId, amount, date, accountId, note);
+        toast.success("Payment recorded");
+        setView("success");
+      } catch {
+        toast.error("Something went wrong. Please try again.");
+      }
     });
   }
 

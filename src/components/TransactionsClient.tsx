@@ -3,12 +3,6 @@
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useState, useEffect, useCallback, useMemo, useTransition } from "react";
-import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-} from "@/components/ui/dialog";
 import { TransactionFormDialog } from "@/components/AddTransactionForm";
 import { QuickAddTransaction } from "@/components/QuickAddTransaction";
 import { TransferFormDialog } from "@/components/AddTransferForm";
@@ -51,22 +45,19 @@ import {
   SortingState,
   useReactTable,
 } from "@tanstack/react-table";
-import { ArrowDownLeft, ArrowRightLeft, ArrowUpDown, ArrowUpRight, CheckCircle2, ChevronDown, ChevronRight, Download, Receipt, RefreshCw, Search, Split, Trash2, X, XCircle } from "lucide-react";
+import { ArrowDownLeft, ArrowRightLeft, ArrowUpDown, ArrowUpRight, ChevronDown, ChevronRight, Download, Receipt, RefreshCw, Search, Split, Trash2, X } from "lucide-react";
 import { SplitTransactionDialog } from "@/components/SplitTransactionDialog";
 import { deleteTransaction } from "@/db/mutations/transactions";
 import { formatCurrency } from "@/lib/formatCurrency";
+import { toast } from "sonner";
 import type { Account, Category } from "@/lib/types";
 import { TransactionsInsightsCharts } from "@/components/TransactionsInsightsCharts";
 import type { DailyCashflowPoint, DailyCategoryExpensePoint } from "@/db/queries/transactions";
 
 function DeleteTransactionButton({
   transaction,
-  onDeleted,
-  onDeleteFailed,
 }: {
   transaction: Transaction;
-  onDeleted: (description: string) => void;
-  onDeleteFailed: () => void;
 }) {
   const [confirming, setConfirming] = useState(false);
   const [isPending, startTransition] = useTransition();
@@ -74,11 +65,10 @@ function DeleteTransactionButton({
   function handleDelete() {
     startTransition(async () => {
       try {
-        const desc = transaction.description;
         await deleteTransaction(transaction.id);
-        onDeleted(desc);
+        toast.success("Transaction deleted");
       } catch {
-        onDeleteFailed();
+        toast.error("Something went wrong. Please try again.");
       } finally {
         setConfirming(false);
       }
@@ -213,7 +203,6 @@ export function TransactionsClient({
   const router = useRouter();
   const [expandedSplits, setExpandedSplits] = useState<Set<string>>(new Set());
   const [highlightedIds, setHighlightedIds] = useState<Set<string>>(new Set());
-  const [deleteResult, setDeleteResult] = useState<{ status: "success" | "error"; description?: string } | null>(null);
   const [sorting, setSorting] = useState<SortingState>([]);
   const [searchInput, setSearchInput] = useState(activeSearch ?? "");
   const [filterStartDate, setFilterStartDate] = useState(activeStartDate ?? "");
@@ -430,8 +419,6 @@ export function TransactionsClient({
             )}
             <DeleteTransactionButton
               transaction={t}
-              onDeleted={(desc) => setDeleteResult({ status: "success", description: desc })}
-              onDeleteFailed={() => setDeleteResult({ status: "error" })}
             />
           </div>
         );
@@ -834,39 +821,6 @@ export function TransactionsClient({
           )}
         </CardContent>
       </Card>
-      <Dialog open={deleteResult !== null} onOpenChange={(open) => !open && setDeleteResult(null)}>
-        <DialogContent showCloseButton={false} className="sm:max-w-sm">
-          <DialogHeader className="sr-only">
-            <DialogTitle>
-              {deleteResult?.status === "success" ? "Transaction deleted" : "Delete failed"}
-            </DialogTitle>
-          </DialogHeader>
-          <div className="flex flex-col items-center gap-4 py-6">
-            {deleteResult?.status === "success" ? (
-              <>
-                <CheckCircle2 className="h-12 w-12 text-emerald-500" />
-                <div className="text-center">
-                  <h3 className="text-lg font-semibold">Transaction deleted</h3>
-                  <p className="text-muted-foreground text-sm mt-1">
-                    &ldquo;{deleteResult.description}&rdquo; has been removed.
-                  </p>
-                </div>
-              </>
-            ) : (
-              <>
-                <XCircle className="h-12 w-12 text-destructive" />
-                <div className="text-center">
-                  <h3 className="text-lg font-semibold">Delete failed</h3>
-                  <p className="text-muted-foreground text-sm mt-1">
-                    Something went wrong. Please try again.
-                  </p>
-                </div>
-              </>
-            )}
-            <Button onClick={() => setDeleteResult(null)}>Done</Button>
-          </div>
-        </DialogContent>
-      </Dialog>
     </div>
   );
 }

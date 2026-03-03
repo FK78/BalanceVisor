@@ -23,6 +23,7 @@ import {
 } from "@/components/ui/dialog";
 import { addSubscription, editSubscription } from "@/db/mutations/subscriptions";
 import type { Account, CategoryWithColor as Category } from "@/lib/types";
+import { toast } from "sonner";
 
 type SubscriptionData = {
   id: string;
@@ -75,12 +76,18 @@ export function SubscriptionFormDialog({
     }
     formData.set("account_id", accountId);
     startTransition(async () => {
-      if (isEdit) {
-        await editSubscription(subscription.id, formData);
-      } else {
-        await addSubscription(formData);
+      try {
+        if (isEdit) {
+          await editSubscription(subscription.id, formData);
+          toast.success("Subscription updated");
+        } else {
+          await addSubscription(formData);
+          toast.success("Subscription added");
+        }
+        setView("success");
+      } catch {
+        toast.error("Something went wrong. Please try again.");
       }
-      setView("success");
     });
   }
 

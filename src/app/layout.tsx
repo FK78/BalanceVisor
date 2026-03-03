@@ -2,6 +2,7 @@ import type { Metadata, Viewport } from "next";
 import "./globals.css";
 import { ThemeProvider } from "@/components/ThemeProvider";
 import { ServiceWorkerRegistrar } from "@/components/ServiceWorkerRegistrar";
+import { Toaster } from "sonner";
 
 export const metadata: Metadata = {
   title: "BalanceVisor",
@@ -47,6 +48,7 @@ export default function RootLayout({
         <ThemeProvider defaultTheme="system">
           {children}
         </ThemeProvider>
+        <Toaster richColors closeButton position="bottom-right" />
         <ServiceWorkerRegistrar />
       </body>
     </html>
