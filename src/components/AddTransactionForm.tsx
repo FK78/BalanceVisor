@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useTransition } from "react";
-import { Plus, Pencil, CheckCircle2, Loader2 } from "lucide-react";
+import { Plus, Pencil, CheckCircle2, Loader2, Sparkles } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -22,6 +22,7 @@ import {
   DialogTrigger,
 } from "@/components/ui/dialog";
 import { addTransaction, editTransaction } from "@/db/mutations/transactions";
+import { learnCategorisationRule } from "@/db/mutations/categorisation-rules";
 import type { Account, Category } from "@/lib/types";
 
 type Transaction = {
@@ -56,6 +57,9 @@ export function TransactionFormDialog({
   const [isPending, startTransition] = useTransition();
   const [formKey, setFormKey] = useState(0);
   const [isRecurring, setIsRecurring] = useState(transaction?.is_recurring ?? false);
+  const [ruleSuggestion, setRuleSuggestion] = useState<{ description: string; categoryId: string; categoryName: string } | null>(null);
+  const [ruleSaved, setRuleSaved] = useState(false);
+  const [isSavingRule, startSavingRule] = useTransition();
 
   const today = new Date().toISOString().split("T")[0];
 
@@ -66,6 +70,8 @@ export function TransactionFormDialog({
       }
       setSavedIds([]);
       setView("form");
+      setRuleSuggestion(null);
+      setRuleSaved(false);
     }
     setOpen(nextOpen);
   }
@@ -76,12 +82,33 @@ export function TransactionFormDialog({
     if (isEdit) {
       formData.set("id", String(transaction.id));
     }
+
+    const newCategoryId = formData.get("category_id") as string | null;
+    const description = formData.get("description") as string;
+
     startTransition(async () => {
       const result = isEdit
         ? await editTransaction(formData)
         : await addTransaction(formData);
       setSavedIds((prev) => [...prev, result.id]);
+
+      // Check if category changed during edit — offer to create a rule
+      if (isEdit && newCategoryId && newCategoryId !== transaction.category_id && description) {
+        const cat = categories.find((c) => c.id === newCategoryId);
+        if (cat) {
+          setRuleSuggestion({ description, categoryId: newCategoryId, categoryName: cat.name });
+        }
+      }
+
       setView("success");
+    });
+  }
+
+  function handleLearnRule() {
+    if (!ruleSuggestion) return;
+    startSavingRule(async () => {
+      await learnCategorisationRule(ruleSuggestion.description, ruleSuggestion.categoryId);
+      setRuleSaved(true);
     });
   }
 
@@ -126,6 +153,34 @@ export function TransactionFormDialog({
                       : `${savedIds.length} transactions added in this session.`}
                 </p>
               </div>
+
+              {ruleSuggestion && !ruleSaved && (
+                <div className="w-full rounded-lg border border-primary/20 bg-primary/5 p-3 space-y-2">
+                  <div className="flex items-center gap-2 text-sm font-medium">
+                    <Sparkles className="h-3.5 w-3.5 text-primary" />
+                    Create a rule?
+                  </div>
+                  <p className="text-xs text-muted-foreground">
+                    Always categorise &ldquo;{ruleSuggestion.description}&rdquo; as <span className="font-medium text-foreground">{ruleSuggestion.categoryName}</span>?
+                  </p>
+                  <div className="flex gap-2">
+                    <Button size="sm" variant="outline" onClick={() => setRuleSuggestion(null)}>
+                      No thanks
+                    </Button>
+                    <Button size="sm" onClick={handleLearnRule} disabled={isSavingRule}>
+                      {isSavingRule && <Loader2 className="mr-1 h-3.5 w-3.5 animate-spin" />}
+                      Create rule
+                    </Button>
+                  </div>
+                </div>
+              )}
+
+              {ruleSaved && (
+                <div className="flex items-center gap-2 text-sm text-emerald-600">
+                  <CheckCircle2 className="h-3.5 w-3.5" />
+                  Rule created — future transactions will auto-categorise.
+                </div>
+              )}
             </div>
             <DialogFooter className="flex gap-2 sm:justify-center">
               {!isEdit && (

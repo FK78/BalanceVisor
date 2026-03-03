@@ -13,11 +13,13 @@ import {
   DialogTrigger,
 } from '@/components/ui/dialog';
 import { importFromTrueLayer, disconnectTrueLayer } from '@/db/mutations/truelayer';
+import { formatTimeAgo } from '@/lib/formatTimeAgo';
 
 type Connection = {
   id: string;
   provider_name: string | null;
   connected_at: Date;
+  last_synced_at: Date | null;
 };
 
 type ImportResult = {
@@ -94,7 +96,9 @@ export function ConnectBankButton({ connections }: { connections: Connection[] }
                         {conn.provider_name ?? 'Bank Account'}
                       </p>
                       <p className="text-xs text-muted-foreground">
-                        Connected {new Date(conn.connected_at).toLocaleDateString()}
+                        {conn.last_synced_at
+                          ? `Synced ${formatTimeAgo(new Date(conn.last_synced_at))}`
+                          : `Connected ${new Date(conn.connected_at).toLocaleDateString()}`}
                       </p>
                     </div>
                   </div>

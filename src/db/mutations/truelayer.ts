@@ -318,6 +318,7 @@ export async function getTrueLayerConnections() {
       id: truelayerConnectionsTable.id,
       provider_name: truelayerConnectionsTable.provider_name,
       connected_at: truelayerConnectionsTable.connected_at,
+      last_synced_at: truelayerConnectionsTable.last_synced_at,
     })
     .from(truelayerConnectionsTable)
     .where(eq(truelayerConnectionsTable.user_id, userId));

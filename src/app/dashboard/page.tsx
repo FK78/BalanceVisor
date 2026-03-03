@@ -42,6 +42,7 @@ import { Button } from "@/components/ui/button";
 import { getUserBaseCurrency } from "@/db/queries/onboarding";
 import { CashflowCharts } from "@/components/CashflowCharts";
 import { NetWorthChart } from "@/components/NetWorthChart";
+import { QuickAddTransaction } from "@/components/QuickAddTransaction";
 import { createClient } from "@/lib/supabase/server";
 import { formatCurrency } from "@/lib/formatCurrency";
 import {
@@ -169,6 +170,7 @@ export default async function Home() {
           </p>
         </div>
         <div className="flex gap-2">
+          <QuickAddTransaction />
           <Button asChild size="sm" variant="outline">
             <Link href="/dashboard/transactions">
               Transactions <ArrowRight className="ml-1 h-3.5 w-3.5" />
