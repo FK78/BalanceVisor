@@ -45,6 +45,7 @@ import { NetWorthChart } from "@/components/NetWorthChart";
 import { QuickAddTransaction } from "@/components/QuickAddTransaction";
 import { createClient } from "@/lib/supabase/server";
 import { formatCurrency } from "@/lib/formatCurrency";
+import { BlurFade } from "@/components/ui/blur-fade";
 import {
   ArrowRight,
   CalendarClock,
@@ -156,7 +157,7 @@ export default async function Home() {
   return (
     <div className="mx-auto max-w-7xl space-y-8 p-6 md:p-10">
       {/* Header with greeting and quick actions */}
-      <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
+      <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between page-header-gradient">
         <div>
           <h1 className="text-3xl font-extrabold tracking-tight">Dashboard</h1>
           <p className="text-muted-foreground mt-1.5 text-sm">
@@ -186,7 +187,7 @@ export default async function Home() {
 
       {/* Net Worth banner */}
       {accounts.length > 0 && (
-        <Card className="bg-gradient-to-br from-primary/6 via-amber-500/4 to-rose-400/6 border-primary/15">
+        <Card className="bg-gradient-to-br from-indigo-500/6 via-violet-500/4 to-cyan-400/6 border-primary/15">
           <CardContent className="flex flex-col gap-4 py-6 sm:flex-row sm:items-center sm:justify-between">
             <div className="flex items-center gap-4">
               <div className="flex h-14 w-14 items-center justify-center rounded-2xl bg-primary/10">
@@ -256,17 +257,19 @@ export default async function Home() {
         </div>
         <div className="bg-muted h-2 rounded-full overflow-hidden">
           <div
-            className="bg-gradient-to-r from-primary to-amber-400 h-full rounded-full transition-all"
+            className="bg-gradient-to-r from-indigo-500 to-cyan-400 h-full rounded-full transition-all"
             style={{ width: `${monthProgress}%` }}
           />
         </div>
       </div>
 
-      <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
-        {summaryCards.map((card) => (
-          <SummaryCard key={card.title} {...card} />
-        ))}
-      </div>
+      <BlurFade delay={0.05} inView>
+        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
+          {summaryCards.map((card) => (
+            <SummaryCard key={card.title} {...card} />
+          ))}
+        </div>
+      </BlurFade>
 
       {/* Spending Insights + Charts */}
       {spendingInsights.length > 0 && (

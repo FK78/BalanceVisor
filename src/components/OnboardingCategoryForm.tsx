@@ -10,7 +10,7 @@ import { CATEGORY_ICONS } from "@/lib/categoryIcons";
 type AddCategoryAction = (formData: FormData) => void | Promise<void>;
 
 export function OnboardingCategoryForm({ action }: { action: AddCategoryAction }) {
-  const [selectedColor, setSelectedColor] = useState("#4CAF50");
+  const [selectedColor, setSelectedColor] = useState("#6366f1");
   const [selectedIcon, setSelectedIcon] = useState<string | null>(null);
   const [iconSearch, setIconSearch] = useState("");
 

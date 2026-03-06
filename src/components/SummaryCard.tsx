@@ -10,7 +10,7 @@ export function SummaryCard({ title, description, value, change, icon: Icon, col
   color: string;
 }) {
   return (
-    <Card className="transition-all duration-200 hover:shadow-md">
+    <Card className="summary-card">
       <CardHeader className="flex flex-row items-center justify-between pb-2">
         <div>
           <CardDescription className="text-sm font-semibold">
@@ -20,8 +20,8 @@ export function SummaryCard({ title, description, value, change, icon: Icon, col
             {description}
           </p>
         </div>
-        <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-muted">
-          <Icon className="text-muted-foreground h-4 w-4" />
+        <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-primary/8">
+          <Icon className="text-primary h-4 w-4" />
         </div>
       </CardHeader>
       <CardContent>

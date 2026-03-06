@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import { BlurFade } from "@/components/ui/blur-fade";
 import { useRouter } from "next/navigation";
 import { useState, useEffect, useCallback, useMemo, useTransition } from "react";
 import { TransactionFormDialog } from "@/components/AddTransactionForm";
@@ -456,7 +457,7 @@ export function TransactionsClient({
 
   return (
     <div className="mx-auto max-w-7xl space-y-8 p-6 md:p-10">
-      <div className="flex items-start justify-between">
+      <div className="flex items-start justify-between page-header-gradient">
         <div>
           <h1 className="text-3xl font-extrabold tracking-tight">Transactions</h1>
           <p className="text-muted-foreground mt-1 text-sm">
@@ -602,8 +603,9 @@ export function TransactionsClient({
       </Card>
 
       {/* Summary cards */}
+      <BlurFade delay={0.05} inView>
       <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
-        <Card>
+        <Card className="summary-card">
           <CardHeader className="flex flex-row items-center justify-between pb-2">
             <div>
               <CardDescription className="text-sm font-medium">
@@ -611,13 +613,15 @@ export function TransactionsClient({
               </CardDescription>
               <p className="text-muted-foreground text-xs">{dateLabel}</p>
             </div>
-            <Receipt className="text-muted-foreground h-4 w-4" />
+            <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-primary/8">
+              <Receipt className="text-primary h-4 w-4" />
+            </div>
           </CardHeader>
           <CardContent>
             <CardTitle className="text-2xl">{totalTransactions}</CardTitle>
           </CardContent>
         </Card>
-        <Card>
+        <Card className="summary-card">
           <CardHeader className="flex flex-row items-center justify-between pb-2">
             <div>
               <CardDescription className="text-sm font-medium">
@@ -625,7 +629,9 @@ export function TransactionsClient({
               </CardDescription>
               <p className="text-muted-foreground text-xs">{dateLabel}</p>
             </div>
-            <ArrowUpRight className="h-4 w-4 text-emerald-500" />
+            <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-emerald-100 dark:bg-emerald-900/30">
+              <ArrowUpRight className="h-4 w-4 text-emerald-500" />
+            </div>
           </CardHeader>
           <CardContent>
             <CardTitle className="text-2xl text-emerald-600">
@@ -633,7 +639,7 @@ export function TransactionsClient({
             </CardTitle>
           </CardContent>
         </Card>
-        <Card>
+        <Card className="summary-card">
           <CardHeader className="flex flex-row items-center justify-between pb-2">
             <div>
               <CardDescription className="text-sm font-medium">
@@ -641,7 +647,9 @@ export function TransactionsClient({
               </CardDescription>
               <p className="text-muted-foreground text-xs">{dateLabel}</p>
             </div>
-            <ArrowDownLeft className="h-4 w-4 text-red-500" />
+            <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-red-100 dark:bg-red-900/30">
+              <ArrowDownLeft className="h-4 w-4 text-red-500" />
+            </div>
           </CardHeader>
           <CardContent>
             <CardTitle className="text-2xl text-red-600">
@@ -650,6 +658,7 @@ export function TransactionsClient({
           </CardContent>
         </Card>
       </div>
+      </BlurFade>
 
       <TransactionsInsightsCharts
         dailyTrend={dailyTrend}

@@ -19,7 +19,7 @@ export async function addDebt(formData: FormData) {
   const minimum_payment = sanitizeNumber(formData.get('minimum_payment') as string, 'Minimum payment', { min: 0 });
   const due_date = sanitizeDate(formData.get('due_date') as string);
   const lender = sanitizeString(formData.get('lender') as string);
-  const color = sanitizeColor(formData.get('color') as string, '#ef4444');
+  const color = sanitizeColor(formData.get('color') as string, '#6366f1');
 
   const [result] = await db.insert(debtsTable).values({
     user_id: userId,
@@ -46,7 +46,7 @@ export async function editDebt(id: string, formData: FormData) {
   const minimum_payment = sanitizeNumber(formData.get('minimum_payment') as string, 'Minimum payment', { min: 0 });
   const due_date = sanitizeDate(formData.get('due_date') as string);
   const lender = sanitizeString(formData.get('lender') as string);
-  const color = sanitizeColor(formData.get('color') as string, '#ef4444');
+  const color = sanitizeColor(formData.get('color') as string, '#6366f1');
 
   await db.update(debtsTable).set({
     name,

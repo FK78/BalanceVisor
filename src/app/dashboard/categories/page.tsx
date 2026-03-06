@@ -42,7 +42,7 @@ export default async function Categories() {
 
   return (
     <div className="mx-auto max-w-7xl space-y-8 p-6 md:p-10">
-      <div className="flex items-start justify-between">
+      <div className="flex items-start justify-between page-header-gradient">
         <div>
           <h1 className="text-3xl font-extrabold tracking-tight">Categories</h1>
           <p className="text-muted-foreground mt-1 text-sm">
@@ -84,7 +84,7 @@ export default async function Categories() {
                 return (
                 <div
                   key={cat.id}
-                  className="flex items-center gap-3 rounded-xl border border-border/60 p-3 transition-all duration-200 hover:shadow-sm"
+                  className="flex items-center gap-3 rounded-xl border border-border/50 p-3 transition-all duration-200 hover:shadow-md hover:shadow-primary/5 hover:-translate-y-0.5 hover:border-primary/15"
                 >
                   {Icon ? (
                     <div

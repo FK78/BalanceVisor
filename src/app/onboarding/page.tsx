@@ -128,7 +128,7 @@ export default async function OnboardingPage({
 
   return (
     <div className="mx-auto max-w-4xl space-y-6 p-6 md:p-10">
-      <div className="flex items-start justify-between">
+      <div className="flex items-start justify-between page-header-gradient">
         <div>
           <h1 className="text-3xl font-extrabold tracking-tight">Set up your workspace</h1>
           <p className="text-muted-foreground mt-1 text-sm">
@@ -144,8 +144,10 @@ export default async function OnboardingPage({
         {ALL_STEPS.map((item, i) => (
           <Link key={item} href={`/onboarding?step=${item}`}>
             <div
-              className={`rounded-md border px-3 py-2 text-center text-sm font-medium capitalize ${
-                step === item ? "bg-secondary text-foreground" : "text-muted-foreground"
+              className={`rounded-xl border px-3.5 py-2 text-center text-sm font-medium capitalize transition-all duration-200 ${
+                step === item
+                  ? "bg-primary/10 text-primary border-primary/20 shadow-sm shadow-primary/5"
+                  : "text-muted-foreground hover:bg-muted hover:text-foreground"
               }`}
             >
               {i + 1}. {item}
