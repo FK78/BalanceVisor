@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { BlurFade } from "@/components/ui/blur-fade";
 import {
   Card,
   CardContent,
@@ -64,7 +65,7 @@ export default async function Budgets() {
   const spentPercent = totalBudget > 0 ? ((totalSpent / totalBudget) * 100).toFixed(0) : "0";
   return (
     <div className="mx-auto max-w-7xl space-y-8 p-6 md:p-10">
-      <div className="flex items-start justify-between">
+      <div className="flex items-start justify-between page-header-gradient">
         <div>
           <h1 className="text-3xl font-extrabold tracking-tight">Budgets</h1>
           <p className="text-muted-foreground mt-1 text-sm">
@@ -85,14 +86,15 @@ export default async function Budgets() {
       )}
 
       {/* Summary */}
+      <BlurFade delay={0.05} inView>
       <div className="grid grid-cols-1 gap-4 sm:grid-cols-4">
-        <Card>
+        <Card className="summary-card">
           <CardHeader className="flex flex-row items-center justify-between pb-2">
             <CardDescription className="text-sm font-semibold">
               Total Budget
             </CardDescription>
-            <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-muted">
-              <Target className="text-muted-foreground h-4 w-4" />
+            <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-primary/8">
+              <Target className="text-primary h-4 w-4" />
             </div>
           </CardHeader>
           <CardContent>
@@ -101,17 +103,17 @@ export default async function Budgets() {
             </CardTitle>
           </CardContent>
         </Card>
-        <Card>
+        <Card className="summary-card">
           <CardHeader className="flex flex-row items-center justify-between pb-2">
             <CardDescription className="text-sm font-semibold">
               Spent
             </CardDescription>
-            <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-orange-100 dark:bg-orange-900/30">
-              <TrendingUp className="h-4 w-4 text-orange-500" />
+            <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-violet-100 dark:bg-violet-900/30">
+              <TrendingUp className="h-4 w-4 text-violet-500" />
             </div>
           </CardHeader>
           <CardContent>
-            <CardTitle className="text-2xl text-orange-600">
+            <CardTitle className="text-2xl text-violet-600">
               {formatCurrency(totalSpent, baseCurrency)}
             </CardTitle>
             <p className="text-muted-foreground mt-1 text-xs">
@@ -119,7 +121,7 @@ export default async function Budgets() {
             </p>
           </CardContent>
         </Card>
-        <Card>
+        <Card className="summary-card">
           <CardHeader className="flex flex-row items-center justify-between pb-2">
             <CardDescription className="text-sm font-semibold">
               Remaining
@@ -134,7 +136,7 @@ export default async function Budgets() {
             </CardTitle>
           </CardContent>
         </Card>
-        <Card>
+        <Card className="summary-card">
           <CardHeader className="flex flex-row items-center justify-between pb-2">
             <CardDescription className="text-sm font-semibold">
               Over Budget
@@ -155,6 +157,7 @@ export default async function Budgets() {
           </CardContent>
         </Card>
       </div>
+      </BlurFade>
 
       {budgets.length > 0 && (
         <BudgetCharts budgets={budgets} currency={baseCurrency} />
@@ -179,6 +182,7 @@ export default async function Budgets() {
           </CardContent>
         </Card>
       ) : (
+        <BlurFade delay={0.1} inView>
         <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
           {budgets.map((budget) => {
             const percent = Math.min(
@@ -191,7 +195,7 @@ export default async function Budgets() {
             const Icon = getCategoryIcon(budget.budgetIcon);
 
             return (
-              <Card key={budget.id} className="relative overflow-hidden">
+              <Card key={budget.id} className="relative overflow-hidden transition-all duration-200 hover:shadow-lg hover:shadow-primary/5 hover:-translate-y-0.5">
                 <div className="p-5 space-y-4">
                   {/* Header: icon + name + actions */}
                   <div className="flex items-center justify-between">
@@ -303,6 +307,7 @@ export default async function Budgets() {
             );
           })}
         </div>
+        </BlurFade>
       )}
     </div>
   );

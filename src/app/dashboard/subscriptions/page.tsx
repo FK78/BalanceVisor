@@ -1,3 +1,4 @@
+import { BlurFade } from "@/components/ui/blur-fade";
 import {
   Card,
   CardContent,
@@ -56,7 +57,7 @@ export default async function SubscriptionsPage() {
 
   return (
     <div className="mx-auto max-w-7xl space-y-8 p-6 md:p-10">
-      <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
+      <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between page-header-gradient">
         <div>
           <h1 className="text-3xl font-extrabold tracking-tight">Subscriptions</h1>
           <p className="text-muted-foreground mt-1 text-sm">
@@ -67,14 +68,15 @@ export default async function SubscriptionsPage() {
       </div>
 
       {/* Summary cards */}
+      <BlurFade delay={0.05} inView>
       <div className="grid grid-cols-1 gap-4 sm:grid-cols-4">
-        <Card>
+        <Card className="summary-card">
           <CardHeader className="flex flex-row items-center justify-between pb-2">
             <CardDescription className="text-sm font-semibold">
               Monthly Cost
             </CardDescription>
-            <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-muted">
-              <DollarSign className="text-muted-foreground h-4 w-4" />
+            <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-primary/8">
+              <DollarSign className="text-primary h-4 w-4" />
             </div>
           </CardHeader>
           <CardContent>
@@ -86,7 +88,7 @@ export default async function SubscriptionsPage() {
             </p>
           </CardContent>
         </Card>
-        <Card>
+        <Card className="summary-card">
           <CardHeader className="flex flex-row items-center justify-between pb-2">
             <CardDescription className="text-sm font-semibold">
               Yearly Cost
@@ -104,7 +106,7 @@ export default async function SubscriptionsPage() {
             </p>
           </CardContent>
         </Card>
-        <Card>
+        <Card className="summary-card">
           <CardHeader className="flex flex-row items-center justify-between pb-2">
             <CardDescription className="text-sm font-semibold">
               Due This Week
@@ -122,7 +124,7 @@ export default async function SubscriptionsPage() {
             </p>
           </CardContent>
         </Card>
-        <Card>
+        <Card className="summary-card">
           <CardHeader className="flex flex-row items-center justify-between pb-2">
             <CardDescription className="text-sm font-semibold">
               Paused
@@ -141,6 +143,7 @@ export default async function SubscriptionsPage() {
           </CardContent>
         </Card>
       </div>
+      </BlurFade>
 
       {/* Subscription cards */}
       {subscriptions.length === 0 ? (
@@ -168,7 +171,7 @@ export default async function SubscriptionsPage() {
             return (
               <Card
                 key={sub.id}
-                className={`relative overflow-hidden transition-all duration-200 ${
+                className={`relative overflow-hidden transition-all duration-200 hover:shadow-lg hover:shadow-primary/5 hover:-translate-y-0.5 ${
                   !sub.is_active ? "opacity-60" : ""
                 }`}
               >

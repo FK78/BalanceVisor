@@ -45,6 +45,7 @@ import { NetWorthChart } from "@/components/NetWorthChart";
 import { QuickAddTransaction } from "@/components/QuickAddTransaction";
 import { createClient } from "@/lib/supabase/server";
 import { formatCurrency } from "@/lib/formatCurrency";
+import { BlurFade } from "@/components/ui/blur-fade";
 import {
   ArrowRight,
   CalendarClock,
@@ -156,7 +157,7 @@ export default async function Home() {
   return (
     <div className="mx-auto max-w-7xl space-y-8 p-6 md:p-10">
       {/* Header with greeting and quick actions */}
-      <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
+      <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between page-header-gradient">
         <div>
           <h1 className="text-3xl font-extrabold tracking-tight">Dashboard</h1>
           <p className="text-muted-foreground mt-1.5 text-sm">
@@ -262,11 +263,13 @@ export default async function Home() {
         </div>
       </div>
 
-      <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
-        {summaryCards.map((card) => (
-          <SummaryCard key={card.title} {...card} />
-        ))}
-      </div>
+      <BlurFade delay={0.05} inView>
+        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
+          {summaryCards.map((card) => (
+            <SummaryCard key={card.title} {...card} />
+          ))}
+        </div>
+      </BlurFade>
 
       {/* Spending Insights + Charts */}
       {spendingInsights.length > 0 && (

@@ -1,6 +1,7 @@
 "use client";
 
 import { useMemo, useState } from "react";
+import { BlurFade } from "@/components/ui/blur-fade";
 import {
   Card,
   CardContent,
@@ -201,7 +202,7 @@ export function ReportsClient({
 
   return (
     <div className="mx-auto max-w-7xl space-y-8 p-6 md:p-10">
-      <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
+      <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between page-header-gradient">
         <div>
           <h1 className="text-3xl font-extrabold tracking-tight">Reports</h1>
           <p className="text-muted-foreground mt-1 text-sm">
@@ -223,11 +224,14 @@ export function ReportsClient({
       </div>
 
       {/* KPI cards */}
+      <BlurFade delay={0.05} inView>
       <div className="grid grid-cols-2 gap-4 sm:grid-cols-5">
-        <Card>
+        <Card className="summary-card">
           <CardHeader className="flex flex-row items-center justify-between pb-2">
             <CardDescription className="text-sm font-semibold">Income</CardDescription>
-            <ArrowUpRight className="h-4 w-4 text-emerald-500" />
+            <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-emerald-100 dark:bg-emerald-900/30">
+              <ArrowUpRight className="h-3.5 w-3.5 text-emerald-500" />
+            </div>
           </CardHeader>
           <CardContent>
             <CardTitle className="text-xl tabular-nums text-emerald-600">
@@ -236,10 +240,12 @@ export function ReportsClient({
             <p className="text-muted-foreground mt-0.5 text-xs">{range}-month total</p>
           </CardContent>
         </Card>
-        <Card>
+        <Card className="summary-card">
           <CardHeader className="flex flex-row items-center justify-between pb-2">
             <CardDescription className="text-sm font-semibold">Expenses</CardDescription>
-            <ArrowDownLeft className="h-4 w-4 text-red-500" />
+            <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-red-100 dark:bg-red-900/30">
+              <ArrowDownLeft className="h-3.5 w-3.5 text-red-500" />
+            </div>
           </CardHeader>
           <CardContent>
             <CardTitle className="text-xl tabular-nums text-red-600">
@@ -248,10 +254,12 @@ export function ReportsClient({
             <p className="text-muted-foreground mt-0.5 text-xs">{range}-month total</p>
           </CardContent>
         </Card>
-        <Card>
+        <Card className="summary-card">
           <CardHeader className="flex flex-row items-center justify-between pb-2">
             <CardDescription className="text-sm font-semibold">Net Savings</CardDescription>
-            <PiggyBank className="h-4 w-4 text-muted-foreground" />
+            <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-primary/8">
+              <PiggyBank className="h-3.5 w-3.5 text-primary" />
+            </div>
           </CardHeader>
           <CardContent>
             <CardTitle className={`text-xl tabular-nums ${totalNet >= 0 ? "text-emerald-600" : "text-red-600"}`}>
@@ -260,10 +268,12 @@ export function ReportsClient({
             <p className="text-muted-foreground mt-0.5 text-xs">{range}-month total</p>
           </CardContent>
         </Card>
-        <Card>
+        <Card className="summary-card">
           <CardHeader className="flex flex-row items-center justify-between pb-2">
             <CardDescription className="text-sm font-semibold">Savings Rate</CardDescription>
-            <Percent className="h-4 w-4 text-muted-foreground" />
+            <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-violet-100 dark:bg-violet-900/30">
+              <Percent className="h-3.5 w-3.5 text-violet-500" />
+            </div>
           </CardHeader>
           <CardContent>
             <CardTitle className={`text-xl tabular-nums ${savingsRate >= 0 ? "text-emerald-600" : "text-red-600"}`}>
@@ -272,14 +282,16 @@ export function ReportsClient({
             <p className="text-muted-foreground mt-0.5 text-xs">of total income</p>
           </CardContent>
         </Card>
-        <Card>
+        <Card className="summary-card">
           <CardHeader className="flex flex-row items-center justify-between pb-2">
             <CardDescription className="text-sm font-semibold">Avg Monthly Spend</CardDescription>
-            {avgMonthlyExpense > 0 ? (
-              <TrendingDown className="h-4 w-4 text-red-500" />
-            ) : (
-              <TrendingUp className="h-4 w-4 text-emerald-500" />
-            )}
+            <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-cyan-100 dark:bg-cyan-900/30">
+              {avgMonthlyExpense > 0 ? (
+                <TrendingDown className="h-3.5 w-3.5 text-cyan-500" />
+              ) : (
+                <TrendingUp className="h-3.5 w-3.5 text-cyan-500" />
+              )}
+            </div>
           </CardHeader>
           <CardContent>
             <CardTitle className="text-xl tabular-nums">
@@ -289,6 +301,7 @@ export function ReportsClient({
           </CardContent>
         </Card>
       </div>
+      </BlurFade>
 
       {/* Monthly income vs expenses */}
       <Card>

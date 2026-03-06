@@ -36,7 +36,7 @@ export default async function RecurringPage() {
 
   return (
     <div className="mx-auto max-w-7xl space-y-8 p-6 md:p-10">
-      <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
+      <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between page-header-gradient">
         <div>
           <h1 className="text-3xl font-extrabold tracking-tight">
             Recurring Transactions
@@ -49,7 +49,7 @@ export default async function RecurringPage() {
 
       {/* Summary cards */}
       <div className="grid grid-cols-1 gap-4 sm:grid-cols-4">
-        <Card>
+        <Card className="summary-card">
           <CardHeader className="flex flex-row items-center justify-between pb-2">
             <CardDescription className="text-sm font-semibold">
               Monthly Expenses
@@ -67,7 +67,7 @@ export default async function RecurringPage() {
             </p>
           </CardContent>
         </Card>
-        <Card>
+        <Card className="summary-card">
           <CardHeader className="flex flex-row items-center justify-between pb-2">
             <CardDescription className="text-sm font-semibold">
               Monthly Income
@@ -85,13 +85,13 @@ export default async function RecurringPage() {
             </p>
           </CardContent>
         </Card>
-        <Card>
+        <Card className="summary-card">
           <CardHeader className="flex flex-row items-center justify-between pb-2">
             <CardDescription className="text-sm font-semibold">
               Net Monthly
             </CardDescription>
-            <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-muted">
-              <DollarSign className="text-muted-foreground h-4 w-4" />
+            <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-primary/8">
+              <DollarSign className="text-primary h-4 w-4" />
             </div>
           </CardHeader>
           <CardContent>
@@ -113,13 +113,13 @@ export default async function RecurringPage() {
             </p>
           </CardContent>
         </Card>
-        <Card>
+        <Card className="summary-card">
           <CardHeader className="flex flex-row items-center justify-between pb-2">
             <CardDescription className="text-sm font-semibold">
               Due This Week
             </CardDescription>
-            <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-sky-100 dark:bg-sky-900/30">
-              <CalendarClock className="h-4 w-4 text-sky-500" />
+            <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-cyan-100 dark:bg-cyan-900/30">
+              <CalendarClock className="h-4 w-4 text-cyan-500" />
             </div>
           </CardHeader>
           <CardContent>

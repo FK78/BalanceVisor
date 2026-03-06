@@ -28,6 +28,7 @@ import { AccountCharts } from "@/components/AccountCharts";
 import { getTrueLayerConnections } from "@/db/mutations/truelayer";
 import { getManualHoldings, getTrading212Connection } from "@/db/queries/investments";
 import Link from "next/link";
+import { BlurFade } from "@/components/ui/blur-fade";
 
 const typeConfig: Record<string, { label: string; variant: "default" | "secondary" | "destructive" | "outline" }> = {
   currentAccount: { label: "Current Account", variant: "secondary" },
@@ -99,7 +100,7 @@ export default async function Accounts() {
 
   return (
     <div className="mx-auto max-w-7xl space-y-8 p-6 md:p-10">
-      <div className="flex items-start justify-between">
+      <div className="flex items-start justify-between page-header-gradient">
         <div>
           <h1 className="text-3xl font-extrabold tracking-tight">Accounts</h1>
           <p className="text-muted-foreground mt-1 text-sm">
@@ -118,13 +119,13 @@ export default async function Accounts() {
 
       {/* Summary row */}
       <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
-        <Card>
+        <BlurFade delay={0} inView><Card className="summary-card">
           <CardHeader className="flex flex-row items-center justify-between pb-2">
             <CardDescription className="text-sm font-semibold">
               Net Worth
             </CardDescription>
-            <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-muted">
-              <DollarSign className="text-muted-foreground h-4 w-4" />
+            <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-primary/8">
+              <DollarSign className="text-primary h-4 w-4" />
             </div>
           </CardHeader>
           <CardContent>
@@ -135,8 +136,8 @@ export default async function Accounts() {
               Across {accounts.length} accounts
             </p>
           </CardContent>
-        </Card>
-        <Card>
+        </Card></BlurFade>
+        <BlurFade delay={0.05} inView><Card className="summary-card">
           <CardHeader className="flex flex-row items-center justify-between pb-2">
             <CardDescription className="text-sm font-semibold">
               Total Assets
@@ -150,8 +151,8 @@ export default async function Accounts() {
               {totalAssets < 0 ? "−" : ""}{formatCurrency(totalAssets, baseCurrency)}
             </CardTitle>
           </CardContent>
-        </Card>
-        <Card>
+        </Card></BlurFade>
+        <BlurFade delay={0.1} inView><Card className="summary-card">
           <CardHeader className="flex flex-row items-center justify-between pb-2">
             <CardDescription className="text-sm font-semibold">
               Total Liabilities
@@ -165,7 +166,7 @@ export default async function Accounts() {
               {formatCurrency(totalLiabilities, baseCurrency)}
             </CardTitle>
           </CardContent>
-        </Card>
+        </Card></BlurFade>
       </div>
 
       {accounts.length > 0 && (
@@ -192,7 +193,7 @@ export default async function Accounts() {
               variant: "secondary" as const,
             };
             return (
-              <Card key={account.id}>
+              <Card key={account.id} className="transition-all duration-200 hover:shadow-lg hover:shadow-primary/5 hover:-translate-y-0.5">
                 <CardHeader className="flex flex-row items-start justify-between">
                   <div className="flex items-center gap-3">
                     <div className="bg-primary/8 flex h-11 w-11 shrink-0 items-center justify-center rounded-xl">

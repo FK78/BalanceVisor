@@ -1,3 +1,5 @@
+"use client";
+
 import Link from "next/link";
 import Image from "next/image";
 import {
@@ -21,6 +23,12 @@ import {
   Wallet,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { NumberTicker } from "@/components/ui/number-ticker";
+import { BlurFade } from "@/components/ui/blur-fade";
+import { ShimmerButton } from "@/components/ui/shimmer-button";
+import { BorderBeam } from "@/components/ui/border-beam";
+import { AnimatedShinyText } from "@/components/ui/animated-shiny-text";
+import { DotPattern } from "@/components/ui/dot-pattern";
 
 const features = [
   {
@@ -162,8 +170,8 @@ export default function Home() {
   return (
     <div className="flex min-h-screen flex-col">
       {/* Nav */}
-      <nav className="sticky top-0 z-50 border-b border-border/60 bg-background/80 backdrop-blur-lg">
-        <div className="mx-auto flex max-w-6xl items-center justify-between px-6 py-3">
+      <nav className="sticky top-0 z-50 border-b border-border/40 bg-background/70 backdrop-blur-xl">
+        <div className="mx-auto flex max-w-6xl items-center justify-between px-6 py-3.5">
           <Link href="/" className="flex items-center gap-2.5 font-bold text-lg">
             <Image src="/logo.svg" alt="BalanceVisor logo" width={30} height={30} />
             <span>BalanceVisor</span>
@@ -180,58 +188,82 @@ export default function Home() {
       </nav>
 
       {/* Hero */}
-      <header className="relative overflow-hidden px-6 py-24 sm:py-32 lg:py-40">
-        <div className="absolute inset-0 -z-10 bg-[radial-gradient(ellipse_80%_60%_at_50%_-20%,rgba(99,102,241,0.08),transparent)]" />
-        <div className="absolute top-20 left-1/4 -z-10 h-72 w-72 rounded-full bg-indigo-200/20 blur-3xl" />
-        <div className="absolute bottom-10 right-1/4 -z-10 h-64 w-64 rounded-full bg-cyan-200/20 blur-3xl" />
+      <header className="relative overflow-hidden px-6 py-28 sm:py-36 lg:py-44">
+        <div className="absolute inset-0 -z-10 bg-[radial-gradient(ellipse_80%_60%_at_50%_-20%,rgba(99,102,241,0.10),transparent)]" />
+        <DotPattern className="absolute inset-0 -z-10 opacity-[0.03] dark:opacity-[0.05] [mask-image:radial-gradient(ellipse_60%_60%_at_50%_50%,black,transparent)]" />
+        <div className="absolute top-20 left-1/4 -z-10 h-80 w-80 rounded-full bg-indigo-300/20 blur-3xl animate-pulse-glow" />
+        <div className="absolute bottom-10 right-1/4 -z-10 h-72 w-72 rounded-full bg-cyan-300/20 blur-3xl animate-pulse-glow" style={{ animationDelay: '2s' }} />
+        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 -z-10 h-96 w-96 rounded-full bg-violet-200/10 blur-3xl animate-pulse-glow" style={{ animationDelay: '3s' }} />
 
         <div className="mx-auto max-w-3xl text-center">
-          <div className="animate-fade-in-up mb-8 inline-flex items-center gap-2 rounded-full border border-primary/20 bg-primary/5 px-5 py-2 text-sm font-medium text-primary">
-            <Sparkles className="h-4 w-4" />
-            100% free — no ads, no premium tier
-          </div>
-          <h1 className="animate-fade-in-up text-4xl font-extrabold tracking-tight sm:text-5xl lg:text-6xl" style={{ animationDelay: "0.1s" }}>
-            Your money, finally{" "}
-            <span className="bg-gradient-to-r from-indigo-500 via-violet-500 to-cyan-400 bg-clip-text text-transparent">
-              under control
-            </span>
-          </h1>
-          <p className="animate-fade-in-up mx-auto mt-6 max-w-xl text-lg leading-relaxed text-muted-foreground" style={{ animationDelay: "0.2s" }}>
-            BalanceVisor helps you track spending, set budgets, manage investments,
-            crush savings goals, and see your full financial picture in one beautifully simple dashboard.
-          </p>
-          <div className="animate-fade-in-up mt-10 flex flex-col items-center gap-3 sm:flex-row sm:justify-center" style={{ animationDelay: "0.3s" }}>
-            <Button asChild size="lg" className="w-full sm:w-auto text-base px-8">
+          <BlurFade delay={0} inView>
+            <div className="mb-8 inline-flex items-center gap-2 rounded-full border border-primary/20 bg-primary/5 px-5 py-2.5 text-sm font-medium text-primary shadow-sm shadow-primary/5">
+              <AnimatedShinyText className="inline-flex items-center gap-2">
+                <Sparkles className="h-4 w-4" />
+                100% free — no ads, no premium tier
+              </AnimatedShinyText>
+            </div>
+          </BlurFade>
+          <BlurFade delay={0.1} inView>
+            <h1 className="text-4xl font-extrabold tracking-tight sm:text-5xl lg:text-6xl leading-[1.1]">
+              Your money, finally{" "}
+              <span className="bg-gradient-to-r from-indigo-500 via-violet-500 to-cyan-400 bg-clip-text text-transparent">
+                under control
+              </span>
+            </h1>
+          </BlurFade>
+          <BlurFade delay={0.2} inView>
+            <p className="mx-auto mt-6 max-w-xl text-lg leading-relaxed text-muted-foreground">
+              BalanceVisor helps you track spending, set budgets, manage investments,
+              crush savings goals, and see your full financial picture in one beautifully simple dashboard.
+            </p>
+          </BlurFade>
+          <BlurFade delay={0.3} inView>
+            <div className="mt-10 flex flex-col items-center gap-3 sm:flex-row sm:justify-center">
               <Link href="/auth/sign-up">
-                Start tracking for free <ArrowRight className="ml-2 h-4 w-4" />
+                <ShimmerButton
+                  shimmerColor="#a78bfa"
+                  shimmerSize="0.05em"
+                  background="linear-gradient(135deg, #6366f1, #8b5cf6)"
+                  className="w-full sm:w-auto text-base px-8 py-3 font-semibold"
+                >
+                  Start tracking for free <ArrowRight className="ml-2 h-4 w-4 inline" />
+                </ShimmerButton>
               </Link>
-            </Button>
-            <Button asChild size="lg" variant="outline" className="w-full sm:w-auto">
-              <Link href="/auth/login">I already have an account</Link>
-            </Button>
-          </div>
+              <Button asChild size="lg" variant="outline" className="w-full sm:w-auto">
+                <Link href="/auth/login">I already have an account</Link>
+              </Button>
+            </div>
+          </BlurFade>
         </div>
       </header>
 
       {/* Social proof stats */}
-      <section className="border-y border-border/60 bg-muted/40 px-6 py-14">
+      <section className="border-y border-border/40 bg-gradient-to-r from-muted/40 via-muted/60 to-muted/40 px-6 py-16">
         <div className="mx-auto grid max-w-4xl grid-cols-2 gap-8 text-center sm:grid-cols-4">
           {[
-            { value: "14", label: "Feature areas" },
-            { value: "5", label: "Account types" },
-            { value: "6", label: "Chart views" },
-            { value: "£0", label: "Forever" },
+            { value: 14, label: "Feature areas", prefix: "" },
+            { value: 5, label: "Account types", prefix: "" },
+            { value: 6, label: "Chart views", prefix: "" },
+            { value: 0, label: "Forever", prefix: "£" },
           ].map((stat) => (
-            <div key={stat.label}>
-              <p className="text-3xl font-extrabold text-primary">{stat.value}</p>
-              <p className="mt-1 text-sm text-muted-foreground">{stat.label}</p>
-            </div>
+            <BlurFade key={stat.label} delay={0.1} inView>
+              <div className="space-y-1">
+                <p className="text-3xl font-extrabold gradient-text">
+                  {stat.prefix}
+                  <NumberTicker value={stat.value} />
+                </p>
+                <p className="text-sm font-medium text-muted-foreground">{stat.label}</p>
+              </div>
+            </BlurFade>
           ))}
         </div>
       </section>
 
       {/* Features grid */}
-      <section className="px-6 py-24 sm:py-32">
+      <section className="relative px-6 py-24 sm:py-32 overflow-hidden">
+        <div className="absolute top-1/4 right-0 -z-10 h-96 w-96 rounded-full bg-indigo-100/30 dark:bg-indigo-900/10 blur-3xl" />
+        <div className="absolute bottom-0 left-0 -z-10 h-80 w-80 rounded-full bg-cyan-100/20 dark:bg-cyan-900/10 blur-3xl" />
         <div className="mx-auto max-w-6xl">
           <div className="mx-auto max-w-2xl text-center">
             <h2 className="text-3xl font-extrabold tracking-tight sm:text-4xl">
@@ -241,27 +273,28 @@ export default function Home() {
               No bloat, no upsells. Every feature is included from day one.
             </p>
           </div>
-          <div className="mt-16 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
-            {features.map((f) => (
-              <div
-                key={f.title}
-                className="group rounded-2xl border border-border/60 bg-card p-6 transition-all duration-200 hover:shadow-lg hover:-translate-y-0.5"
-              >
-                <div className={`flex h-12 w-12 items-center justify-center rounded-2xl ${f.bg}`}>
-                  <f.icon className={`h-6 w-6 ${f.color}`} />
+          <div className="mt-16 grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
+            {features.map((f, i) => (
+              <BlurFade key={f.title} delay={0.05 * i} inView>
+                <div
+                  className="group rounded-2xl border border-border/50 bg-card/80 backdrop-blur-sm p-6 transition-all duration-300 hover:shadow-xl hover:shadow-primary/5 hover:-translate-y-1 hover:border-primary/20"
+                >
+                  <div className={`flex h-12 w-12 items-center justify-center rounded-2xl ${f.bg} transition-transform duration-300 group-hover:scale-110`}>
+                    <f.icon className={`h-6 w-6 ${f.color}`} />
+                  </div>
+                  <h3 className="mt-5 text-base font-bold">{f.title}</h3>
+                  <p className="mt-2 text-sm leading-relaxed text-muted-foreground">
+                    {f.description}
+                  </p>
                 </div>
-                <h3 className="mt-5 text-base font-bold">{f.title}</h3>
-                <p className="mt-2 text-sm leading-relaxed text-muted-foreground">
-                  {f.description}
-                </p>
-              </div>
+              </BlurFade>
             ))}
           </div>
         </div>
       </section>
 
       {/* How it works */}
-      <section className="border-t border-border/60 bg-muted/40 px-6 py-24 sm:py-32">
+      <section className="border-t border-border/40 bg-gradient-to-b from-muted/40 to-muted/20 px-6 py-24 sm:py-32">
         <div className="mx-auto max-w-4xl">
           <div className="text-center">
             <h2 className="text-3xl font-extrabold tracking-tight sm:text-4xl">
@@ -271,15 +304,18 @@ export default function Home() {
               No complicated setup. Just start adding your data.
             </p>
           </div>
-          <div className="mt-16 grid gap-10 sm:grid-cols-3">
-            {steps.map((s) => (
-              <div key={s.step} className="flex flex-col items-center text-center">
-                <div className="flex h-16 w-16 items-center justify-center rounded-3xl bg-primary/10 text-3xl">
-                  {s.emoji}
+          <div className="mt-16 grid gap-10 sm:grid-cols-3 relative">
+            <div className="hidden sm:block absolute top-8 left-[20%] right-[20%] h-px bg-gradient-to-r from-transparent via-primary/20 to-transparent" />
+            {steps.map((s, i) => (
+              <BlurFade key={s.step} delay={0.15 * i} inView>
+                <div className="flex flex-col items-center text-center relative">
+                  <div className="flex h-16 w-16 items-center justify-center rounded-3xl bg-gradient-to-br from-primary/10 to-primary/5 text-3xl ring-4 ring-background shadow-lg shadow-primary/5">
+                    {s.emoji}
+                  </div>
+                  <h3 className="mt-5 text-base font-bold">{s.title}</h3>
+                  <p className="mt-2 text-sm leading-relaxed text-muted-foreground">{s.description}</p>
                 </div>
-                <h3 className="mt-5 text-base font-bold">{s.title}</h3>
-                <p className="mt-2 text-sm leading-relaxed text-muted-foreground">{s.description}</p>
-              </div>
+              </BlurFade>
             ))}
           </div>
         </div>
@@ -287,45 +323,57 @@ export default function Home() {
 
       {/* Security callout */}
       <section className="px-6 py-24">
-        <div className="mx-auto max-w-3xl rounded-3xl border border-border/60 bg-gradient-to-br from-indigo-500/5 via-card to-cyan-500/5 p-8 sm:p-12">
-          <div className="flex flex-col items-center gap-6 text-center sm:flex-row sm:text-left">
-            <div className="flex h-16 w-16 shrink-0 items-center justify-center rounded-2xl bg-primary/10">
-              <Shield className="h-8 w-8 text-primary" />
-            </div>
-            <div>
-              <h3 className="text-xl font-bold">Your data stays yours</h3>
-              <p className="mt-2 text-sm leading-relaxed text-muted-foreground">
-                BalanceVisor uses Supabase with row-level security — your financial data is
-                isolated and encrypted. We don&apos;t sell data, serve ads, or share anything
-                with third parties. Ever.
-              </p>
+        <BlurFade delay={0.1} inView>
+          <div className="relative mx-auto max-w-3xl rounded-3xl border border-primary/10 bg-gradient-to-br from-indigo-500/5 via-card to-cyan-500/5 p-8 sm:p-12 shadow-lg shadow-primary/5 overflow-hidden">
+            <BorderBeam size={200} duration={8} colorFrom="#6366f1" colorTo="#06b6d4" />
+            <div className="flex flex-col items-center gap-6 text-center sm:flex-row sm:text-left">
+              <div className="flex h-16 w-16 shrink-0 items-center justify-center rounded-2xl bg-gradient-to-br from-primary/15 to-primary/5">
+                <Shield className="h-8 w-8 text-primary" />
+              </div>
+              <div>
+                <h3 className="text-xl font-bold">Your data stays yours</h3>
+                <p className="mt-2 text-sm leading-relaxed text-muted-foreground">
+                  BalanceVisor uses Supabase with row-level security — your financial data is
+                  isolated and encrypted. We don&apos;t sell data, serve ads, or share anything
+                  with third parties. Ever.
+                </p>
+              </div>
             </div>
           </div>
-        </div>
+        </BlurFade>
       </section>
 
       {/* Final CTA */}
-      <section className="border-t border-border/60 px-6 py-24 sm:py-32">
-        <div className="mx-auto max-w-2xl text-center">
-          <h2 className="text-3xl font-extrabold tracking-tight sm:text-4xl">
-            Ready to take control?
-          </h2>
-          <p className="mt-4 text-lg text-muted-foreground">
-            Join BalanceVisor today — it takes less than a minute and
-            it&apos;s completely free. No catches.
-          </p>
-          <div className="mt-10 flex flex-col items-center gap-3 sm:flex-row sm:justify-center">
-            <Button asChild size="lg" className="w-full sm:w-auto text-base px-8">
+      <section className="relative border-t border-border/40 px-6 py-24 sm:py-32 overflow-hidden">
+        <div className="absolute inset-0 -z-10 bg-[radial-gradient(ellipse_60%_50%_at_50%_50%,rgba(99,102,241,0.04),transparent)]" />
+        <DotPattern className="absolute inset-0 -z-10 opacity-[0.02] dark:opacity-[0.04] [mask-image:radial-gradient(ellipse_50%_50%_at_50%_50%,black,transparent)]" />
+        <BlurFade delay={0.1} inView>
+          <div className="mx-auto max-w-2xl text-center">
+            <h2 className="text-3xl font-extrabold tracking-tight sm:text-4xl">
+              Ready to take control?
+            </h2>
+            <p className="mt-4 text-lg text-muted-foreground">
+              Join BalanceVisor today — it takes less than a minute and
+              it&apos;s completely free. No catches.
+            </p>
+            <div className="mt-10 flex flex-col items-center gap-3 sm:flex-row sm:justify-center">
               <Link href="/auth/sign-up">
-                Create your free account <ArrowRight className="ml-2 h-4 w-4" />
+                <ShimmerButton
+                  shimmerColor="#a78bfa"
+                  shimmerSize="0.05em"
+                  background="linear-gradient(135deg, #6366f1, #8b5cf6)"
+                  className="w-full sm:w-auto text-base px-8 py-3 font-semibold"
+                >
+                  Create your free account <ArrowRight className="ml-2 h-4 w-4 inline" />
+                </ShimmerButton>
               </Link>
-            </Button>
+            </div>
           </div>
-        </div>
+        </BlurFade>
       </section>
 
       {/* Footer */}
-      <footer className="border-t border-border/60 px-6 py-10">
+      <footer className="border-t border-border/40 bg-muted/30 px-6 py-10">
         <div className="mx-auto flex max-w-6xl flex-col items-center justify-between gap-4 sm:flex-row">
           <div className="flex items-center gap-2.5 text-sm font-bold">
             <Image src="/logo.svg" alt="BalanceVisor" width={22} height={22} />

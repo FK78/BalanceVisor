@@ -22,7 +22,7 @@ export default async function SettingsPage() {
 
   return (
     <div className="mx-auto max-w-2xl space-y-8 p-6 md:p-10">
-      <div>
+      <div className="page-header-gradient">
         <h1 className="text-3xl font-extrabold tracking-tight">Settings</h1>
         <p className="text-muted-foreground mt-1 text-sm">
           Manage your profile, preferences, and data.
